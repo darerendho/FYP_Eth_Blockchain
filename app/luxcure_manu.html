@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Luxcure</title>
+  <script src="./javascripts/jquery-3.2.1.js"></script>
+  <script src="./javascripts/utils.js"></script>
+  <script src="./javascripts/tether.js"></script>
+  <script src="./javascripts/bootstrap.min.js"></script>
+  <script src="./javascripts/web3.js"></script>
+  <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
+  <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
+
+  <script>
+
+    if (typeof web3 !== 'undefined') {
+  web3 = new Web3(web3.currentProvider);
+  } else {
+  // set the provider you want from Web3.providers
+  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+}
+  function createContract(){
+  web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
+  var contract_abi = web3.eth.contract([
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "model",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "status",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getCurrentOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_current_owner",
+          "type": "string"
+        },
+        {
+          "name": "_model",
+          "type": "string"
+        },
+        {
+          "name": "_previous_owner",
+          "type": "string"
+        },
+        {
+          "name": "_status",
+          "type": "string"
+        },
+        {
+          "name": "_date_manufactured",
+          "type": "string"
+        }
+      ],
+      "name": "addNewGoods",
+      "outputs": [
+        {
+          "name": "made",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "previous_owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "date_manufactured",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "current_owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    }
+  ]
+);
+var contract = contract_abi.at("0xcfc02973009f594d33e1079debf994fd90f5aa37"); // Deployed contract on the Blockchain
+contract.owner.sendTransaction();
+  //Alter a new contract NOT creating a new contract YET
+  var current_owner = document.getElementById("current_owner").value;
+  //var model = document.getElementById("model").value;
+  //var previous_owner = document.getElementById("prev_owner").value;
+  //var status = document.getElementById("status").value;
+  //var date_manufactured = document.getElementById("date_manufactured").value;
+  contract.addNewGoods.sendTransaction(current_owner,"2017","none","Avaialble","28/07/2017",{
+    from:web3.eth.accounts[0],
+         gas:4000000,function(error,result){
+           if(!error){
+             console.log(result);
+           }
+           else{
+             console.log(error);
+           }
+         }
+  });
+  contract.getCurrentOwner(function(error,current_owner){
+    if(!error){
+      console.log("The current owner is "+current_owner);
+    }
+    else{
+      console.log(error);
+    }
+  }
+  );
+  contract.getOwner(function(error,c_owner){
+    if(!error){
+      console.log("The contract owner is "+c_owner);
+    }
+    else{
+      console.log(error);
+    }
+  }
+);
+
+}
+  //current_owner = web3.toAscii(owner);
+  //console.log(current_owner);
+  //var balanceWei = web3.eth.getBalance(account).toNumber();
+  //var balance = web3.fromWei(balanceWei,'ether');
+  //var number = web3.eth.blockNumber;
+
+  </script>
+</head>
+
+<body>
+<h1>Proof-of-Existence goods authentication</h1>
+  <h1>Deploy a goods smart contract into an Ethereum Blockchain</h1>
+<div class="contentform">
+  <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
+
+
+  <div class="leftcontact">
+        <div class="form-group">
+          <p>Manufacturer Name:<span>*</span></p>
+          <span class="icon-case"><i class="fa fa-male"></i></span>
+            <input type="text" name="current_owner" id="current_owner" data-rule="required" data-msg="Please enter the manufacturer name."/>
+            <div class="validation"></div>
+   </div>
+
+        <div class="form-group">
+        <p>Model: <span>*</span></p>
+        <span class="icon-case"><i class="fa fa-user"></i></span>
+    <input type="text" name="model" id="model" data-rule="required" data-msg="Please enter a model number before submiting"/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Pevious Owner <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-envelope-o"></i></span>
+            <input type="text" name="prev_owner" id="prev_owner" data-rule="required" data-msg="Please enter a previous owner"/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Status <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-home"></i></span>
+    <input type="text" name="status" id="status" data-rule="required" data-msg="Please add the status of the item."/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Date manufactured <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-location-arrow"></i></span>
+    <input type="text" name="date_manufactured" id="date_manufactured" data-rule="required" data-msg="Please add the date that item is manufactured"/>
+            <div class="validation"></div>
+  </div>
+<!--
+  <div class="form-group">
+  <p>Postcode <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-map-marker"></i></span>
+    <input type="text" name="postal" id="postal" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Code postal' doit être renseigné."/>
+            <div class="validation"></div>
+  </div>
+-->
+</div>
+
+<div class="rightcontact">
+<!--
+  <div class="form-group">
+  <p>City <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-building-o"></i></span>
+    <input type="text" name="ville" id="ville" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Ville' doit être renseigné."/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Phone number <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-phone"></i></span>
+    <input type="text" name="phone" id="phone" data-rule="maxlen:10" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Téléphone' doit être renseigné. Minimum 10 chiffres"/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Function <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-info"></i></span>
+            <input type="text" name="fonction" id="fonction" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Fonction' doit être renseigné."/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Subject <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-comment-o"></i></span>
+            <input type="text" name="sujet" id="sujet" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Sujet' doit être renseigné."/>
+            <div class="validation"></div>
+  </div>
+
+  <div class="form-group">
+  <p>Message <span>*</span></p>
+  <span class="icon-case"><i class="fa fa-comments-o"></i></span>
+            <textarea name="message" rows="14" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Message' doit être renseigné."></textarea>
+            <div class="validation"></div>
+  </div>
+</div>
+-->
+</div>
+
+<button type="submit" onclick="createContract();" class="bouton-contact">Deploy Smart Contract</button>
+
+
+
+</body>
+</html>
