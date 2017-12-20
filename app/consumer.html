@@ -374,6 +374,7 @@ contract.setStatus.sendTransaction(status,{
   from:web3.eth.accounts[1],
   gas:4000000
 });
+
 contract.getStatus(function(error,status){
 if(!error){
   console.log(web3.toAscii(status));
@@ -381,8 +382,7 @@ if(!error){
 else{
   console.log(error);
 }
-}
-);
+});
 
 }
 
@@ -446,7 +446,7 @@ else{
     </div>
 
     <div class="form-group">
-      <button type="submit" onclick="contractOwner();" class="bouton-contact">Change status</button>
+      <button type="submit" onclick="changeStatus();" class="bouton-contact">Change status</button>
     </div>
 <!--
     <div class="form-group">
