@@ -377,13 +377,13 @@ contract.transaferOwnership.sendTransaction(transfer_address,{
 var txhash = contract.getCurrentOwner(function(error,current_owner){
   if(!error){
     console.log("The current owner is" +current_owner);
+    document.getElementById("transfer_ownership").value="Ownership Transferred";
   }
   else{
     console.log(error);
   }
 });
 
-console.log(txhash);
 }
 
 

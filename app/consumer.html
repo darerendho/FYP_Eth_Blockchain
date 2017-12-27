@@ -77,7 +77,31 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [],
+    "inputs": [
+      {
+        "name": "_owner",
+        "type": "uint256"
+      }
+    ],
+    "name": "getOwnerByIndex",
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "_stats",
+        "type": "bytes32"
+      }
+    ],
     "name": "status",
     "outputs": [
       {
@@ -98,7 +122,12 @@ var contract_abi = web3.eth.contract([
       }
     ],
     "name": "setStatus",
-    "outputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -147,7 +176,12 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [],
+    "inputs": [
+      {
+        "name": "_transfer_owner",
+        "type": "address"
+      }
+    ],
     "name": "owners_count",
     "outputs": [
       {
@@ -182,7 +216,12 @@ var contract_abi = web3.eth.contract([
       }
     ],
     "name": "addRepairInfo",
-    "outputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address"
+      }
+    ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -210,7 +249,12 @@ var contract_abi = web3.eth.contract([
     "constant": false,
     "inputs": [],
     "name": "manufacturer",
-    "outputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -273,7 +317,12 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [],
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "name": "getPreviousOwner",
     "outputs": [
       {
@@ -339,7 +388,7 @@ contract.getManufacturer(function(error,manufacturer){
 }
 
 function noOfOwners(){
-contract.getNumberOfOwners(function(error,number_of_owners){
+ contract.getNumberOfOwners(function(error,number_of_owners){
   if(!error){
     document.getElementById('owners').value = number_of_owners;
   }
@@ -386,6 +435,24 @@ else{
 
 }
 
+function getAllOwners(){
+
+var no_of_people = contract.getNumberOfOwners();
+
+for(index = 0; index < no_of_people; index++){
+contract.getOwnerByIndex(index,function(error,owner){
+if(!error){
+  console.log(owner);
+}
+else{
+  console.log(error);
+}
+});
+}
+
+
+} // end getAllOwners
+
   </script>
 </head>
 
@@ -418,7 +485,7 @@ else{
     </div>
 
     <div class="form-group">
-        <button type="submit" onclick="noOfOwners();" class="bouton-contact">Get original contract owner</button>
+        <button type="submit" onclick="noOfOwners();" class="bouton-contact">Get number of owners</button>
     </div>
 
   </div>
@@ -448,14 +515,10 @@ else{
     <div class="form-group">
       <button type="submit" onclick="changeStatus();" class="bouton-contact">Change status</button>
     </div>
-<!--
+
     <div class="form-group">
-    <p>Message <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-comments-o"></i></span>
-              <textarea name="message" rows="14" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Message' doit être renseigné."></textarea>
-              <div class="validation"></div>
+      <button type="submit" onclick="getAllOwners();" class="bouton-contact">Get all owners</button>
     </div>
--->
   </div>
 
   </div>
