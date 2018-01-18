@@ -21,233 +21,39 @@
   web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
   var contract_abi = [
     {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "owners",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getManufacturer",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "model",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
       "constant": false,
       "inputs": [
         {
-          "name": "owner",
-          "type": "address"
+          "name": "setNumbers",
+          "type": "uint256[]"
         }
       ],
-      "name": "setOwner",
+      "name": "setArray",
       "outputs": [],
       "payable": false,
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "constant": true,
       "inputs": [],
-      "name": "status",
+      "name": "getArray",
       "outputs": [
         {
           "name": "",
-          "type": "string"
+          "type": "uint256[]"
         }
       ],
       "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getStatus",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "owners_count",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "previousOwner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [],
-      "name": "manufacturer",
-      "outputs": [],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getModel",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getCurrentOwner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_model",
-          "type": "string"
-        },
-        {
-          "name": "_status",
-          "type": "string"
-        },
-        {
-          "name": "_date_manufactured",
-          "type": "string"
-        }
-      ],
-      "name": "addNewGoods",
-      "outputs": [
-        {
-          "name": "made",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "date_manufactured",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getOwnerCount",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getDateManufactured",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
+      "stateMutability": "view",
       "type": "function"
     }
   ];
-var contract = web3.eth.contract(contract_abi); // Deployed contract on the Blockchain
-const contractInstance = contract.new(
-  {
-      from: web3.eth.accounts[0]
-  }, (err,res) =>{
-    if(err){
-      console.log(err);
-      return;
-    }
-
-    console.log(res.transactionHash);
-
-    if(res.address){
-      console.log('Contract Address'+res.address);
-    }
-
-  }
-);
-
+var contract = new web3.eth.contract(contract_abi,{
+  from: web3.eth.accounts[0],
+  gasPrice: '20000000000'
+}); // Deployed contract on the Blockchain
+    console.log(contract);
 </script>
 </head>
 <body>

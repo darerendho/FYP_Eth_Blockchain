@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Luxcure</title>
+  <title>Luxcure - Manufacturer</title>
   <script src="./javascripts/jquery-3.2.1.js"></script>
+  <script src="./javascripts/moment.js"></script>
   <script src="./javascripts/utils.js"></script>
   <script src="./javascripts/tether.js"></script>
-  <script src="./javascripts/bootstrap.min.js"></script>
+  <script src="./javascripts/bootstrap.js"></script>
   <script src="./javascripts/web3.js"></script>
+  <script src="./javascripts/qrcode.js"></script>
+  <!-- <script src="./javascripts/bootstrap-datetimepicker.js"></script> -->
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
+  <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap-datetimepicker.min.css"/>
 
   <script>
     if (typeof web3 !== 'undefined') {
@@ -310,7 +314,6 @@
       "name": "getDateManufactured",
       "outputs": [
         {
-          "name": "",
           "type": "bytes32"
         }
       ],
@@ -320,14 +323,27 @@
     }
   ]);
 
-var contract = contract_abi.at("0xcfc02973009f594d33e1079debf994fd90f5aa37"); // Deployed contract on the Blockchain
+//Smart Contract deployed on the blockchain
+// $(function () {
+//     $('#datetimepicker1').datetimepicker();
+// });
 
+var contract_address,contract;
+function workOnContract(){
+  contract_address = document.getElementById("contract_address").value;
+  contract  = contract_abi.at(contract_address);
+  alert(contract_address);
+}
+
+
+
+//Add basic information about the Certificate of Authtenticity
 function addInfoContract(){
 contract.manufacturer.sendTransaction();
 var model = web3.fromAscii(document.getElementById("model").value);
 var status = web3.fromAscii(document.getElementById("status").value);
 var date_manufactured = web3.fromAscii(document.getElementById("date_manufactured").value);
-contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
+var tx_hash_1 = contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
     from:web3.eth.accounts[0],
          gas:4000000,function(error,result){
            if(!error){
@@ -338,55 +354,26 @@ contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
            }
          }
   });
-  contract.getManufacturer(function(error,manufacturer){
-    if(!error){
-      console.log("The current owner is "+manufacturer);
-    }
-    else{
-      console.log(error);
-    }
-  }
-  );
-  contract.getCurrentOwner(function(error,current_owner){
-    if(!error){
-      console.log("The current owner is "+current_owner);
-    }
-    else{
-      console.log(error);
-    }
-  }
-  );
-  contract.getNumberOfOwners(function(error,no_owners){
-    if(!error){
-      console.log("The number of owners is "+no_owners);
-    }
-    else{
-      console.log(error);
-    }
-  }
-);
+
+  //Read the previously written information from the smart contract
+  var _model =web3.toAscii(contract.getModel());
+  var _status =web3.toAscii(contract.getStatus());
+  var _date_manufactured =web3.toAscii(contract.getDateManufactured());
+
+  alert("Transaction hash:"+tx_hash_1+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured);
 }
 
+//Transfer ownership of smart contract(Certificate of Authtenticity)
 function transferOwnership(){
 var transfer_address = document.getElementById("ethereum_trans_address").value;
-contract.transaferOwnership.sendTransaction(transfer_address,{
+var tx_hash = contract.transaferOwnership.sendTransaction(transfer_address,{
     from:web3.eth.accounts[0],
     gas:4000000
 });
 
-var txhash = contract.getCurrentOwner(function(error,current_owner){
-  if(!error){
-    console.log("The current owner is" +current_owner);
-    document.getElementById("transfer_ownership").value="Ownership Transferred";
-  }
-  else{
-    console.log(error);
-  }
-});
-
+var _current_owner = contract.getCurrentOwner();
+alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to"+_current_owner);
 }
-
-
 
   </script>
 </head>
@@ -398,74 +385,111 @@ var txhash = contract.getCurrentOwner(function(error,current_owner){
 <div class="contentform">
   <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
+ <div class="leftcontact">
+   <div class="form-group">
+   <p>Smart Contract : <span>*</span></p>
+   <span class="icon-case"><i class="fa fa-map-marker"></i></span>
+     <input type="text"  id="contract_address" data-rule="required" data-msg="Enter an Ethereum address before beginning"/>
+             <div class="validation"></div>
+   </div>
 
-  <div class="leftcontact">
+   <div class="form-group">
+     <button type="submit" onclick="workOnContract();" class="bouton-contact">Change contract</button>
+   </div>
+
   <div class="form-group">
-    <p>Model: <span>*</span></p>
+    <p>Model : <span>*</span></p>
      <span class="icon-case"><i class="fa fa-user"></i></span>
     <input type="text" name="model" id="model" data-rule="required" data-msg="Please enter a model number before submiting"/>
             <div class="validation"></div>
   </div>
 
   <div class="form-group">
-  <p>Status: <span>*</span></p>
+  <p>Status : <span>*</span></p>
   <span class="icon-case"><i class="fa fa-home"></i></span>
     <input type="text" name="status" id="status" data-rule="required" data-msg="Please add the status of the item."/>
             <div class="validation"></div>
   </div>
 
   <div class="form-group">
-  <p>Date manufactured: <span>*</span></p>
+  <p>Date manufactured : <span>*</span></p>
   <span class="icon-case"><i class="fa fa-location-arrow"></i></span>
-    <input type="text" name="date_manufactured" id="date_manufactured" data-rule="required" data-msg="Please add the date that item is manufactured"/>
+    <input id="date_manufactured" type="text" data-rule="required" data-msg="Please add the date that item is manufactured"/>
             <div class="validation"></div>
   </div>
-<!--
   <div class="form-group">
-  <p>Postcode <span>*</span></p>
-  <span class="icon-case"><i class="fa fa-map-marker"></i></span>
-    <input type="text" name="postal" id="postal" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Code postal' doit être renseigné."/>
-            <div class="validation"></div>
+    <button type="submit" onclick="addInfoContract();" class="bouton-contact">Add contract information</button>
   </div>
--->
+
 </div>
 
 <div class="rightcontact">
 
+    <div>
+    <p>Generate QR code for contract address</p>
+    <input type="text" id="text_qr_code" placeholder="Enter an Ethereum smart contract address here"fa  style="width:80%"/>
+    <div id="qrcode" style="width:100px; height:100px; margin-top:15px;"></div>
+    </div>
+  </br>
+  </br>
+  </br>
+
+  <!--
+    <div class="form-group">
+      <button type="submit" onclick="contractOwner();" class="bouton-contact">Get original contract owner</button>
+    </div>
+
+    <div class="form-group">
+    <p>Message <span>*</span></p>
+    <span class="icon-case"><i class="fa fa-comments-o"></i></span>
+              <textarea name="message" rows="14" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Message' doit être renseigné."></textarea>
+              <div class="validation"></div>
+    </div>
+  -->
+
   <div class="form-group">
-  <p>Transfer Ownership <span>*</span></p>
+  <p>Transfer Ownership : <span>*</span></p>
   <span class="icon-case"><i class="fa fa-building-o"></i></span>
     <input type="text" name="ethereum_trans_address" id="ethereum_trans_address" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Ville' doit être renseigné."/>
             <div class="validation"></div>
   </div>
 
   <div class="form-group">
-    <button type="submit" id="transfer_ownership" onclick="transferOwnership();" class="bouton-contact">Deploy Smart Contract</button>
+    <button type="submit" id="transfer_ownership" onclick="transferOwnership();" class="bouton-contact">Transfer</button>
   </div>
-<!--
-  <div class="form-group">
-  <p>Get manufacturer <span>*</span></p>
-  <span class="icon-case"><i class="fa fa-info"></i></span>
-            <input type="text" name="manufacturer" id="manufacturer" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Fonction' doit être renseigné."/>
-            <div class="validation"></div>
-  </div>
-
-  <div class="form-group">
-    <button type="submit" onclick="contractOwner();" class="bouton-contact">Get original contract owner</button>
-  </div>
-
-  <div class="form-group">
-  <p>Message <span>*</span></p>
-  <span class="icon-case"><i class="fa fa-comments-o"></i></span>
-            <textarea name="message" rows="14" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Message' doit être renseigné."></textarea>
-            <div class="validation"></div>
-  </div>
--->
+</div>
 </div>
 
-</div>
+<script>
+//QR code
+var qrcode = new QRCode(document.getElementById("qrcode"), {
+	width : 100,
+	height : 100
+});
 
-<button type="submit" onclick="addInfoContract();" class="bouton-contact">Deploy Smart Contract</button>
+function makeCode () {
+	var elText = document.getElementById("text_qr_code");
+	if (!elText.value) {
+		//alert("Input a text");
+		elText.focus();
+		return;
+	}
+
+	qrcode.makeCode(elText.value);
+}
+
+makeCode();
+
+$("#text_qr_code").
+	on("blur", function () {
+		makeCode();
+	}).
+	on("keydown", function (e) {
+		if (e.keyCode == 13) {
+			makeCode();
+		}
+	});
+</script>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!doctype HTML>
 <html>
 <head>
-    <title>Luxcure - Consumer</title>
+  <title>Luxcure - Buyer</title>
   <script src="./javascripts/jquery-3.2.1.js"></script>
   <script src="./javascripts/utils.js"></script>
   <script src="./javascripts/tether.js"></script>
@@ -17,8 +17,9 @@ web3 = new Web3(web3.currentProvider);
 // set the provider you want from Web3.providers
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
+//Add text field to change account buyer for web3 eth address
 
-web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
+
 var contract_abi = web3.eth.contract([
   {
     "constant": false,
@@ -369,151 +370,46 @@ var contract_abi = web3.eth.contract([
   }
 ]);
 
-// Deployed contract on the Blockchain
-var contract = contract_abi.at("0xcfc02973009f594d33e1079debf994fd90f5aa37");
-
-//Validate the the original owner belong to a manufacturer
-function contractOwner(){
+function verificationOfManAndLatestOwner(){
+  var manufacturer_verify;
+  var owner_verify;
+  var owner = document.getElementById("latest_owner").value;
+  var latest_owner = contract.getCurrentOwner();
 contract.getManufacturer(function(error,manufacturer){
   if(!error){
     if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
-        document.getElementById('manufacturer').value = "Smart contract original owner correspond to the manufacturer Ethereum address. ";
+        manufacturer_verify = "Smart contract original owner correspond to the manufacturer Ethereum address. ";
     }
     else{
-        document.getElementById('manufacturer').value = "Not original manufacturer.";
+        manufacturer_verify = "Not original manufacturer.";
     }
   }
   else{
     console.log(error);
   }
 });
-}
 
-//Get the number of previous owners
-function noOfOwners(){
- contract.getNumberOfOwners(function(error,number_of_owners){
-  if(!error){
-    document.getElementById('owners').value = number_of_owners;
-  }
-  else{
-    console.log(error);
-  }
-});
-}
-
-//Trasnfer ownership from current 2nd owner to 3rd owner
-function transferOwnership(){
-var transfer_address = document.getElementById("ethereum_trans_address").value;
-contract.transaferOwnership.sendTransaction(transfer_address,{
-    from:web3.eth.accounts[1],
-    gas:4000000
-});
-
-var _current_owner = contract.getCurrentOwner();
-alert("The owner has been changed to "+_current_owner);
-
-}
-
-//Change status of  the item from Available OR Stolen
-//Stolen attribute can only be changed by the contract owner
-function changeStatus(){
-var status = web3.fromAscii(document.getElementById("status").value);
-
-contract.setStatus.sendTransaction(status,{
-  from:web3.eth.accounts[1],
-  gas:4000000
-});
-
-contract.getStatus(function(error,status){
-if(!error){
-alert("The status has been changed to " +web3.toAscii(status));
+if(latest_owner == owner){
+   owner_verify = "Latest owner correspond to smart contract.";
 }
 else{
-  console.log(error);
-}
-});
-
+   owner_verify = "Latest owner does not correspond to smart contract.";
 }
 
-//Get all owners from index 0 to latest
-function getAllOwners(){
-var no_of_people = contract.getNumberOfOwners();
-var list = '';
-for(index = 0; index < no_of_people; index++){
-list += contract.getOwnerByIndex(index) + "\n";
-}
-alert("The previous owners are (from first to last)\n"+list);
-} // end getAllOwners
 
+}//end verificationOfManAndLatestOwner
+
+function sendEtherForContract(){
+var send = web3.eth.sendTransaction({from:eth.coinbase,to:contract_address, value:web3.toWei(0.05, "ether")});
+
+}//end sendEtherForContract
   </script>
 </head>
-
-
 <body>
-  <h1>Proof-of-Existence goods authentication</h1>
-    <h1>Deploy a goods smart contract into an Ethereum Blockchain</h1>
-    <h1> Manufacturer owner is 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
-  <div class="contentform">
-    <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
 
-    <div class="leftcontact">
-    <div class="form-group">
-      <p>Validate Manufacturer: <span>*</span></p>
-       <span class="icon-case"><i class="fa fa-user"></i></span>
-      <input type="text" name="manufacturer" id="manufacturer" data-rule="required" data-msg="Please enter a model number before submiting"/>
-              <div class="validation"></div>
-    </div>
 
-    <div class="form-group">
-      <button type="submit" onclick="contractOwner();" class="bouton-contact">Get original contract owner</button>
-    </div>
 
-    <div class="form-group">
-    <p>Get number of owners: <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-location-arrow"></i></span>
-      <input type="text" name="owners" id="owners" data-rule="required" data-msg="Please add the date that item is manufactured"/>
-              <div class="validation"></div>
-    </div>
-
-    <div class="form-group">
-        <button type="submit" onclick="noOfOwners();" class="bouton-contact">Get number of owners</button>
-    </div>
-
-  </div>
-
-  <div class="rightcontact">
-
-    <div class="form-group">
-    <p>Transfer Ownership: <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-building-o"></i></span>
-      <input type="text" name="ethereum_trans_address" id="ethereum_trans_address" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Ville' doit être renseigné."/>
-              <div class="validation"></div>
-    </div>
-
-    <div class="form-group">
-      <button type="submit" onclick="transferOwnership();" class="bouton-contact">Transfer ownership</button>
-    </div>
-
-    <div class="form-group">
-    <p>Flag stolen: <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-info"></i></span>
-    <select id="status">
-      <option value = "available">Available </option>
-      <option value = "stolen">Stolen </option>
-    </select>
-    </div>
-
-    <div class="form-group">
-      <button type="submit" onclick="changeStatus();" class="bouton-contact">Change status</button>
-    </div>
-
-    <div class="form-group">
-      <button type="submit" onclick="getAllOwners();" class="bouton-contact">Get all owners</button>
-    </div>
-  </div>
-
-  </div>
 
 </body>
 </html>
