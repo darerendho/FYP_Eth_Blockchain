@@ -19,7 +19,6 @@ web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
 //Add text field to change account buyer for web3 eth address
 
-
 var contract_abi = web3.eth.contract([
   {
     "constant": false,
@@ -97,12 +96,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "_stats",
-        "type": "bytes32"
-      }
-    ],
+    "inputs": [],
     "name": "status",
     "outputs": [
       {
@@ -123,12 +117,7 @@ var contract_abi = web3.eth.contract([
       }
     ],
     "name": "setStatus",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -177,12 +166,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "_transfer_owner",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "owners_count",
     "outputs": [
       {
@@ -198,31 +182,12 @@ var contract_abi = web3.eth.contract([
     "constant": false,
     "inputs": [
       {
-        "name": "_transfer_owner",
-        "type": "address"
-      }
-    ],
-    "name": "transaferOwnership",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
         "name": "_log",
         "type": "bytes32"
       }
     ],
     "name": "addRepairInfo",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -244,20 +209,6 @@ var contract_abi = web3.eth.contract([
     ],
     "payable": false,
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "manufacturer",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -318,12 +269,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "getPreviousOwner",
     "outputs": [
       {
@@ -355,6 +301,20 @@ var contract_abi = web3.eth.contract([
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_transfer_owner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
     "name": "getDateManufactured",
@@ -367,49 +327,144 @@ var contract_abi = web3.eth.contract([
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   }
 ]);
+var ethereum_address;
+var contract;
 
+//Use the current ethereum user (No need private key)
+function changeEthereumAddress(){
+ethereum_address = document.getElementById("ethereum_address").value;
+web3.eth.defaultAccount = ethereum_address;
+alert("Changed the user to "+ethereum_address);
+}
+
+//Change the contract address
+function changeContract(){
+  contract_address = document.getElementById("smart_contract").value;
+  contract  = contract_abi.at(contract_address);
+  alert("Working on smart contract "+contract_address);
+}
+
+/*
+1) Get the original manufacturer address and verify it
+2) Latest owner
+3) Get model,status and data Manufactured
+4) List of previous ownership
+5) Number of ownership
+6) OPTIONAL - repairs done on good
+*/
 function verificationOfManAndLatestOwner(){
-  var manufacturer_verify;
-  var owner_verify;
-  var owner = document.getElementById("latest_owner").value;
-  var latest_owner = contract.getCurrentOwner();
-contract.getManufacturer(function(error,manufacturer){
-  if(!error){
-    if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
-        manufacturer_verify = "Smart contract original owner correspond to the manufacturer Ethereum address. ";
-    }
-    else{
-        manufacturer_verify = "Not original manufacturer.";
-    }
-  }
-  else{
-    console.log(error);
-  }
-});
+  var manufacturer_verify; // 1)
+  var latest_owner = contract.getCurrentOwner(); // 2)
+  var model = web3.toAscii(contract.getModel());   //3)
+  var status = web3.toAscii(contract.getStatus()); //3)
+  var date_manufactured = web3.toAscii(contract.getDateManufactured()); //3)
+  var list = '';  // 4)
+  var no_owners = contract.getNumberOfOwners(); //5)
 
-if(latest_owner == owner){
-   owner_verify = "Latest owner correspond to smart contract.";
-}
-else{
-   owner_verify = "Latest owner does not correspond to smart contract.";
-}
+  for(index = 0; index < no_owners; index++){
+  list += contract.getOwnerByIndex(index) + "\n";
+  }
 
+  contract.getManufacturer(function(error,manufacturer){
+    if(!error){
+      if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
+          manufacturer_verify = "Smart contract original owner correspond to the manufacturer Ethereum address. \n  ";
+      }
+      else{
+          manufacturer_verify = "Not original manufacturer. \n ";
+      }
+    }
+  });
+
+  document.getElementById('contract_information').value = manufacturer_verify+"\n The latest owner is "+latest_owner+".\n Model: "
+                                                          +model+". \n Status: "+status+".\n Date manufactured: "+date_manufactured+ ".\n List of owners: "+list+".\n Number of owners: " +no_owners;
 
 }//end verificationOfManAndLatestOwner
 
-function sendEtherForContract(){
-var send = web3.eth.sendTransaction({from:eth.coinbase,to:contract_address, value:web3.toWei(0.05, "ether")});
+//Receive Ether on the contract
+function sendEthertoContract(){
+var payment_tx = web3.eth.sendTransaction({from:ethereum_address,
+                                          to:contract_address,
+                                          value:web3.toWei(5, "ether")});
+
 
 }//end sendEtherForContract
   </script>
 </head>
+<header>
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Luxcure</a>
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item ">
+        <a class="nav-link" href="./">Manufacturer</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./consumer">Consumer/Seller</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " href="./buyer">Buyer</a>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+</header>
 <body>
+  <h1>Proof-of-Existence goods authentication</h1>
+  <h1>Verify manufacturer and owner while purchasing good</h1>
+  <h1>Deploy a goods smart contract into an Ethereum Blockchain</h1>
 
+  <div class="contentform">
+    <div class="leftcontact">
 
+    <div class="form-group">
 
+      <p>Current account: </p>
+        <input type="text" id="ethereum_address" placeholder="Enter ethereum address e.g 0x12f1..."/>
+      </div>
+      <div class="form-group">
+          <button type="submit" onclick="changeEthereumAddress();" class="bouton-contact">Update</button>
+      </div>
 
+      <div class="form-group">
+        <p>Current smart contract: </p>
+            <input type="text" name="smart_contract" id="smart_contract" placeholder="Enter smart contract address..."/>
+            <button type="submit" onclick="changeContract();" class="bouton-contact">Change contract</button>
+      </div>
 
+      <div class="form-group">
+        <p>Get smart contract information: </p>
+          <textarea row="10" col="10" id="contract_information" name="contract_information"></textarea>
+          <button type="submit" onclick="verificationOfManAndLatestOwner();" class="bouton-contact">Get information</button>
+      </div>
+
+  </div>
+
+  <div class="rightcontact">
+
+    <div class="form-group">
+    <p>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</p>
+      <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
+      <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." />
+    </div>
+    <div class="form-group">
+      <button type="submit" onclick="sendEthertoContract();" class="bouton-contact">Transfer ownership</button>
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>

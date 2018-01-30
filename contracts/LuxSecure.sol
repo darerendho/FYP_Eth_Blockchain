@@ -11,11 +11,10 @@ bytes32 public date_manufactured;                // DDMMYYYY
 uint public log_count;                           // Repair log count
 mapping(uint => bytes32) public repairs;         // Repair log
 
-// Set Owner of the Good
-function manufacturer() public{
-  if(owners_count == 0){
+
+// Set Owner of the Good upon deployment of smart contract to the blockchain
+function LuxSecure () public{
   contract_owner = msg.sender;
-}
 }
 
  // Add a information new product to the blockchain with a new serial
@@ -33,8 +32,8 @@ function addNewOwner(address _new_owner) private {
   owners_count += 1;
 }
 
-//Transfer ownership of good to another person
-function transaferOwnership(address _transfer_owner) public{
+//Transfer ownership of good to another person require()
+function transferOwnership(address _transfer_owner) public{
     contract_owner = _transfer_owner;
     addNewOwner(contract_owner);
 }
@@ -92,5 +91,11 @@ return status;
 function getDateManufactured() public constant returns(bytes32){
   return date_manufactured;
 }
+
+/* Pay in ether to receive smart contract(Certificate of authentication)
+function sendEther(address _buyer)public{
+  contract_owner.transfer(this.balance);
+  transferOwnership(_buyer);
+} */
 
 }// end of LuxSecure

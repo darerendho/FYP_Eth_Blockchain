@@ -1,12 +1,13 @@
 <!doctype HTML>
 <html>
 <head>
-    <title>Luxcure - Consumer</title>
+  <title>Luxcure - Consumer</title>
   <script src="./javascripts/jquery-3.2.1.js"></script>
   <script src="./javascripts/utils.js"></script>
   <script src="./javascripts/tether.js"></script>
   <script src="./javascripts/bootstrap.min.js"></script>
   <script src="./javascripts/web3.js"></script>
+  <script src="./javascripts/qrcode.js"></script>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
 
@@ -18,7 +19,7 @@ web3 = new Web3(web3.currentProvider);
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
 
-web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
+web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer) should be consumer address [1]
 var contract_abi = web3.eth.contract([
   {
     "constant": false,
@@ -96,12 +97,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "_stats",
-        "type": "bytes32"
-      }
-    ],
+    "inputs": [],
     "name": "status",
     "outputs": [
       {
@@ -122,12 +118,7 @@ var contract_abi = web3.eth.contract([
       }
     ],
     "name": "setStatus",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -176,12 +167,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "_transfer_owner",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "owners_count",
     "outputs": [
       {
@@ -197,31 +183,12 @@ var contract_abi = web3.eth.contract([
     "constant": false,
     "inputs": [
       {
-        "name": "_transfer_owner",
-        "type": "address"
-      }
-    ],
-    "name": "transaferOwnership",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
         "name": "_log",
         "type": "bytes32"
       }
     ],
     "name": "addRepairInfo",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -243,20 +210,6 @@ var contract_abi = web3.eth.contract([
     ],
     "payable": false,
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "manufacturer",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -317,12 +270,7 @@ var contract_abi = web3.eth.contract([
   },
   {
     "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
     "name": "getPreviousOwner",
     "outputs": [
       {
@@ -354,6 +302,20 @@ var contract_abi = web3.eth.contract([
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_transfer_owner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
     "name": "getDateManufactured",
@@ -366,11 +328,26 @@ var contract_abi = web3.eth.contract([
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   }
 ]);
 
 // Deployed contract on the Blockchain
-var contract = contract_abi.at("0xcfc02973009f594d33e1079debf994fd90f5aa37");
+//todo: Should change to a drop downlist to retrieve goods you own base on ethereum address - need a db to associate user address to smart contract address
+
+var contract;
+
+//Change the contract being worked on
+function workOnContract(){
+  contract_address = document.getElementById("contract_address").value;
+  contract  = contract_abi.at(contract_address);
+  alert("Working on smart contract "+contract_address);
+}
 
 //Validate the the original owner belong to a manufacturer
 function contractOwner(){
@@ -389,22 +366,22 @@ contract.getManufacturer(function(error,manufacturer){
 });
 }
 
-//Get the number of previous owners
-function noOfOwners(){
- contract.getNumberOfOwners(function(error,number_of_owners){
-  if(!error){
-    document.getElementById('owners').value = number_of_owners;
-  }
-  else{
-    console.log(error);
-  }
-});
+//Get all owners from index 0 to latest
+function getAllOwners(){
+var no_of_people = contract.getNumberOfOwners();
+var list = '';
+for(index = 0; index < no_of_people; index++){
+list += contract.getOwnerByIndex(index) + "\n";
 }
+var no_owners = contract.getNumberOfOwners();
+document.getElementById('owners').value = "The previous owners are (from first to last)\n"+list+"\n Total number of owners: "+no_owners;
+//alert("The previous owners are (from first to last)\n"+list);
+} // end getAllOwners
 
 //Trasnfer ownership from current 2nd owner to 3rd owner
 function transferOwnership(){
 var transfer_address = document.getElementById("ethereum_trans_address").value;
-contract.transaferOwnership.sendTransaction(transfer_address,{
+contract.transferOwnership.sendTransaction(transfer_address,{
     from:web3.eth.accounts[1],
     gas:4000000
 });
@@ -435,19 +412,41 @@ else{
 
 }
 
-//Get all owners from index 0 to latest
-function getAllOwners(){
-var no_of_people = contract.getNumberOfOwners();
-var list = '';
-for(index = 0; index < no_of_people; index++){
-list += contract.getOwnerByIndex(index) + "\n";
-}
-alert("The previous owners are (from first to last)\n"+list);
-} // end getAllOwners
-
+//Get the number of previous owners
+// function noOfOwners(){
+//  contract.getNumberOfOwners(function(error,number_of_owners){
+//   if(!error){
+//     document.getElementById('owners').value = number_of_owners;
+//   }
+//   else{
+//     console.log(error);
+//   }
+// });
+// }
   </script>
 </head>
+<header>
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Luxcure</a>
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item ">
+        <a class="nav-link" href="./manufacturer">Manufacturer</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./consumer">Consumer/Seller</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " href="./buyer">Buyer</a>
+      </li>
+    </ul>
 
+  </div>
+</nav>
+</header>
 
 <body>
   <h1>Proof-of-Existence goods authentication</h1>
@@ -458,36 +457,42 @@ alert("The previous owners are (from first to last)\n"+list);
 
 
     <div class="leftcontact">
-    <div class="form-group">
-      <p>Validate Manufacturer: <span>*</span></p>
-       <span class="icon-case"><i class="fa fa-user"></i></span>
-      <input type="text" name="manufacturer" id="manufacturer" data-rule="required" data-msg="Please enter a model number before submiting"/>
-              <div class="validation"></div>
-    </div>
+      <div class="form-group">
+        <p>Change Smart Contract: <span>*</span></p>
+         <span class="icon-case"><i class="fa fa-user"></i></span>
+        <input type="text" name="contract_address" id="contract_address" data-rule="required" data-msg="Please enter correct address" placeholder="e.g 0x2fb350c462e3d20bd4..."/>
+                <div class="validation"></div>
+      </div>
 
-    <div class="form-group">
-      <button type="submit" onclick="contractOwner();" class="bouton-contact">Get original contract owner</button>
-    </div>
+      <div class="form-group">
+        <button type="submit" onclick="workOnContract();" class="bouton-contact">Change to your contract</button>
+      </div>
 
-    <div class="form-group">
-    <p>Get number of owners: <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-location-arrow"></i></span>
-      <input type="text" name="owners" id="owners" data-rule="required" data-msg="Please add the date that item is manufactured"/>
-              <div class="validation"></div>
-    </div>
+      <div class="form-group">
+        <p>Validate Manufacturer: <span>*</span></p>
+          <span class="icon-case"><i class="fa fa-user"></i></span>
+            <input type="text" name="manufacturer" id="manufacturer" data-rule="required" data-msg="Please enter a model number before submiting" placeholder="Compare original owners..."/>
+        </div>
 
-    <div class="form-group">
-        <button type="submit" onclick="noOfOwners();" class="bouton-contact">Get number of owners</button>
-    </div>
+      <div class="form-group">
+        <button type="submit" onclick="contractOwner();" class="bouton-contact">Get original contract owner</button>
+      </div>
 
+      <div class="form-group">
+        <p>History of all owners:</p>
+          <textarea rows="10" cols="50" name="owners" id="owners" placeholder="Hit enter to get contract history..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" onclick="getAllOwners();" class="bouton-contact">Get history</button>
+      </div>
   </div>
 
   <div class="rightcontact">
-
     <div class="form-group">
     <p>Transfer Ownership: <span>*</span></p>
     <span class="icon-case"><i class="fa fa-building-o"></i></span>
-      <input type="text" name="ethereum_trans_address" id="ethereum_trans_address" data-rule="required" data-msg="Vérifiez votre saisie sur les champs : Le champ 'Ville' doit être renseigné."/>
+      <input type="text" name="ethereum_trans_address" id="ethereum_trans_address" data-rule="required" placeholder="Enter user ethereum address..."/>
               <div class="validation"></div>
     </div>
 
@@ -499,8 +504,8 @@ alert("The previous owners are (from first to last)\n"+list);
     <p>Flag stolen: <span>*</span></p>
     <span class="icon-case"><i class="fa fa-info"></i></span>
     <select id="status">
-      <option value = "available">Available </option>
-      <option value = "stolen">Stolen </option>
+      <option value = "Available">Available </option>
+      <option value = "Stolen">Stolen </option>
     </select>
     </div>
 
@@ -509,11 +514,48 @@ alert("The previous owners are (from first to last)\n"+list);
     </div>
 
     <div class="form-group">
-      <button type="submit" onclick="getAllOwners();" class="bouton-contact">Get all owners</button>
+      <div>
+      <p>Generate QR code for contract address</p>
+      <input type="text" id="text_qr_code" placeholder="Enter an Ethereum smart contract address here..."fa  style="width:80%"/>
+      <div id="qrcode" style="width:100px; height:100px; margin-top:15px;"></div>
+      </div>
+    </br>
+    </br>
+    </br>
     </div>
-  </div>
 
   </div>
 
+  </div>
+  <script>
+  //QR code
+  var qrcode = new QRCode(document.getElementById("qrcode"), {
+  	width : 100,
+  	height : 100
+  });
+
+  function makeCode () {
+  	var elText = document.getElementById("text_qr_code");
+  	if (!elText.value) {
+  		//alert("Input a text");
+  		elText.focus();
+  		return;
+  	}
+
+  	qrcode.makeCode(elText.value);
+  }
+
+  makeCode();
+
+  $("#text_qr_code").
+  	on("blur", function () {
+  		makeCode();
+  	}).
+  	on("keydown", function (e) {
+  		if (e.keyCode == 13) {
+  			makeCode();
+  		}
+  	});
+  </script>
 </body>
 </html>
