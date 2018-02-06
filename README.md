@@ -1,6 +1,7 @@
-# Webpack Truffle Box
+# Ethereum dApp project
+The main purpose of this project is to create a new method of anti-countfeiting measures utilsing the blockchain.
 
-This box it our most bare official implementation with Webpack. Includes contracts, migrations, tests, user interface and webpack build pipeline.
+
 
 ## Installation
 
