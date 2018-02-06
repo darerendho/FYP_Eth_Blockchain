@@ -152,6 +152,20 @@ var contract_abi = web3.eth.contract([
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_buyer",
+        "type": "address"
+      }
+    ],
+    "name": "sendEther",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
     "name": "getStatus",
@@ -341,7 +355,7 @@ var contract_abi = web3.eth.contract([
 //todo: Should change to a drop downlist to retrieve goods you own base on ethereum address - need a db to associate user address to smart contract address
 
 var contract;
-
+var contract_address;
 //Change the contract being worked on
 function workOnContract(){
   contract_address = document.getElementById("contract_address").value;
@@ -411,6 +425,19 @@ else{
 });
 
 }
+
+//getContractEther
+function getContractEther(){
+web3.eth.getBalance(contract_address,function(error,ether){
+if(error){
+   alert(error);
+}
+else{
+  alert("The current ether stored in the contract is "+ether)
+}
+  });
+
+}//end getContractEther
 
 //Get the number of previous owners
 // function noOfOwners(){
@@ -490,10 +517,18 @@ else{
 
   <div class="rightcontact">
     <div class="form-group">
-    <p>Transfer Ownership: <span>*</span></p>
-    <span class="icon-case"><i class="fa fa-building-o"></i></span>
-      <input type="text" name="ethereum_trans_address" id="ethereum_trans_address" data-rule="required" placeholder="Enter user ethereum address..."/>
-              <div class="validation"></div>
+    <p>Transfer Ownership: </p>
+    <select id="ethereum_trans_address">
+      <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">User 1: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
+      <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 2: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
+      <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 3: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
+      <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">User 4: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
+      <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">User 5: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+      <option value = "0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed">User 6: 0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed</option>
+      <option value = "0x11af1cf9324e22e0028aa559e70c23e077e924ce">User 7: 0x11af1cf9324e22e0028aa559e70c23e077e924ce</option>
+      <option value = "0x43b464d9450a5cef57e63765197dc83691d92eec">User 8: 0x43b464d9450a5cef57e63765197dc83691d92eec</option>
+      <option value = "0x7a20e20fd8b785209fef40e0d7d4580b40183878">User 9: 0x7a20e20fd8b785209fef40e0d7d4580b40183878</option>
+    </select>
     </div>
 
     <div class="form-group">
@@ -504,13 +539,18 @@ else{
     <p>Flag stolen: <span>*</span></p>
     <span class="icon-case"><i class="fa fa-info"></i></span>
     <select id="status">
-      <option value = "Available">Available </option>
+      <option value = "Available"> Available </option>
+      <option value = "Owned"> Owned </option>
       <option value = "Stolen">Stolen </option>
     </select>
     </div>
 
     <div class="form-group">
       <button type="submit" onclick="changeStatus();" class="bouton-contact">Change status</button>
+    </div>
+
+    <div class="form-group">
+      <button type="submit" onclick="getContractEther();" class="bouton-contact">Check contract value</button>
     </div>
 
     <div class="form-group">

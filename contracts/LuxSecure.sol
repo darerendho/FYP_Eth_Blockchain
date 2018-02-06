@@ -92,10 +92,13 @@ function getDateManufactured() public constant returns(bytes32){
   return date_manufactured;
 }
 
-/* Pay in ether to receive smart contract(Certificate of authentication)
-function sendEther(address _buyer)public{
+// Pay in ether to receive smart contract(Certificate of authentication) and need to check if avaliable
+function sendEther(address _buyer) payable public{
+  // todo: send funds to contract owner then transfer ownership
   contract_owner.transfer(this.balance);
   transferOwnership(_buyer);
-} */
+
+}//end sendEther
+
 
 }// end of LuxSecure

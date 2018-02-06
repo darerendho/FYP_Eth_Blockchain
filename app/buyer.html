@@ -151,6 +151,20 @@ var contract_abi = web3.eth.contract([
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "_buyer",
+        "type": "address"
+      }
+    ],
+    "name": "sendEther",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
     "name": "getStatus",
@@ -389,13 +403,14 @@ function verificationOfManAndLatestOwner(){
 
 }//end verificationOfManAndLatestOwner
 
-//Receive Ether on the contract
+//Transfer ether to the contract to receive ownership
 function sendEthertoContract(){
-var payment_tx = web3.eth.sendTransaction({from:ethereum_address,
-                                          to:contract_address,
-                                          value:web3.toWei(5, "ether")});
-
-
+var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
+         value:web3.toWei(5, "ether")}
+       );
+       var new_owner = contract.getCurrentOwner();
+       alert("The tx hash "+payment_tx+".\nOwnership of smart contract "+contract_address+" transferred to "+new_owner+".");
+       
 }//end sendEtherForContract
   </script>
 </head>
@@ -430,10 +445,19 @@ var payment_tx = web3.eth.sendTransaction({from:ethereum_address,
     <div class="leftcontact">
 
     <div class="form-group">
-
       <p>Current account: </p>
-        <input type="text" id="ethereum_address" placeholder="Enter ethereum address e.g 0x12f1..."/>
+        <select id="ethereum_address">
+          <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 1: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
+          <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 2: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
+          <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">User 3: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
+          <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">User 4: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+          <option value = "0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed">User 5: 0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed</option>
+          <option value = "0x11af1cf9324e22e0028aa559e70c23e077e924ce">User 6: 0x11af1cf9324e22e0028aa559e70c23e077e924ce</option>
+          <option value = "0x43b464d9450a5cef57e63765197dc83691d92eec">User 7: 0x43b464d9450a5cef57e63765197dc83691d92eec</option>
+          <option value = "0x7a20e20fd8b785209fef40e0d7d4580b40183878">User 8: 0x7a20e20fd8b785209fef40e0d7d4580b40183878</option>
+        </select>
       </div>
+
       <div class="form-group">
           <button type="submit" onclick="changeEthereumAddress();" class="bouton-contact">Update</button>
       </div>
@@ -457,7 +481,7 @@ var payment_tx = web3.eth.sendTransaction({from:ethereum_address,
     <div class="form-group">
     <p>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</p>
       <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
-      <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." />
+  <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
     </div>
     <div class="form-group">
       <button type="submit" onclick="sendEthertoContract();" class="bouton-contact">Transfer ownership</button>
