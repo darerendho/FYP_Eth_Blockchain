@@ -357,14 +357,49 @@ function changeEthereumAddress(){
 ethereum_address = document.getElementById("ethereum_address").value;
 web3.eth.defaultAccount = ethereum_address;
 alert("Changed the user to "+ethereum_address);
-}
+}//end changeEthereumAddress
 
 //Change the contract address
 function changeContract(){
   contract_address = document.getElementById("smart_contract").value;
   contract  = contract_abi.at(contract_address);
-  alert("Working on smart contract "+contract_address);
-}
+  contract.getManufacturer(function(err,res){
+    if(res){
+      alert("Working on smart contract "+contract_address);
+      document.getElementById("ethereum_contract_address").value = contract_address;
+      document.getElementById("btn_get_ownership").disabled=false;
+
+      var manu = contract.getManufacturer(); // 1)
+      var latest_owner = contract.getCurrentOwner(); // 2)
+      var model = web3.toAscii(contract.getModel());   //3)
+      var status = web3.toAscii(contract.getStatus()); //3)
+      var date_manufactured = web3.toAscii(contract.getDateManufactured()); //3)
+      var list = '';  // 4)
+      var no_owners = contract.getNumberOfOwners(); //5)
+
+      for(index = 0; index < no_owners; index++){
+      list += contract.getOwnerByIndex(index) + "\n";
+      }
+
+    if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manu){
+      document.getElementById("verified").value = "Manufacturer Verified";
+    }
+    else{
+      document.getElementById("verified").value =  "Not original manufacturer";
+    }
+    document.getElementById("latest_owner").value =  latest_owner;
+    document.getElementById("model").value =  model;
+    document.getElementById("status").value =  status;
+    document.getElementById("date_manufactured").value =  date_manufactured;
+    document.getElementById("no_owners").value = no_owners;
+    document.getElementById("list_owners").value = list;
+    }
+    else{
+      alert("Invalid smart contract entered, please re-enter.")
+    }
+  });
+
+}//end changeContract
 
 /*
 1) Get the original manufacturer address and verify it
@@ -374,34 +409,34 @@ function changeContract(){
 5) Number of ownership
 6) OPTIONAL - repairs done on good
 */
-function verificationOfManAndLatestOwner(){
-  var manufacturer_verify; // 1)
-  var latest_owner = contract.getCurrentOwner(); // 2)
-  var model = web3.toAscii(contract.getModel());   //3)
-  var status = web3.toAscii(contract.getStatus()); //3)
-  var date_manufactured = web3.toAscii(contract.getDateManufactured()); //3)
-  var list = '';  // 4)
-  var no_owners = contract.getNumberOfOwners(); //5)
-
-  for(index = 0; index < no_owners; index++){
-  list += contract.getOwnerByIndex(index) + "\n";
-  }
-
-  contract.getManufacturer(function(error,manufacturer){
-    if(!error){
-      if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
-          manufacturer_verify = "Smart contract original owner correspond to the manufacturer Ethereum address. \n  ";
-      }
-      else{
-          manufacturer_verify = "Not original manufacturer. \n ";
-      }
-    }
-  });
-
-  document.getElementById('contract_information').value = manufacturer_verify+"\n The latest owner is "+latest_owner+".\n Model: "
-                                                          +model+". \n Status: "+status+".\n Date manufactured: "+date_manufactured+ ".\n List of owners: "+list+".\n Number of owners: " +no_owners;
-
-}//end verificationOfManAndLatestOwner
+// function verificationOfManAndLatestOwner(){
+//   var manu = contract.getManufacturer(); // 1)
+//   var latest_owner = contract.getCurrentOwner(); // 2)
+//   var model = web3.toAscii(contract.getModel());   //3)
+//   var status = web3.toAscii(contract.getStatus()); //3)
+//   var date_manufactured = web3.toAscii(contract.getDateManufactured()); //3)
+//   var list = '';  // 4)
+//   var no_owners = contract.getNumberOfOwners(); //5)
+//
+//   for(index = 0; index < no_owners; index++){
+//   list += contract.getOwnerByIndex(index) + "\n";
+//   }
+//
+// if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manu){
+//   document.getElementById("verified").value = "Manufacturer Verified";
+// }
+// else{
+//   document.getElementById("verified").value =  "Not original manufacturer";
+// }
+// document.getElementById("latest_owner").value =  latest_owner;
+// document.getElementById("model").value =  model;
+// document.getElementById("status").value =  status;
+// document.getElementById("date_manufactured").value =  date_manufactured;
+// document.getElementById("no_owners").value = no_owners;
+// document.getElementById("list_owners").value = list;
+//
+//
+// }//end verificationOfManAndLatestOwner
 
 //Transfer ether to the contract to receive ownership
 function sendEthertoContract(){
@@ -410,7 +445,7 @@ var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ether
        );
        var new_owner = contract.getCurrentOwner();
        alert("The tx hash "+payment_tx+".\nOwnership of smart contract "+contract_address+" transferred to "+new_owner+".");
-       
+
 }//end sendEtherForContract
   </script>
 </head>
@@ -438,14 +473,13 @@ var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ether
 </header>
 <body>
   <h1>Proof-of-Existence goods authentication</h1>
-  <h1>Verify manufacturer and owner while purchasing good</h1>
-  <h1>Deploy a goods smart contract into an Ethereum Blockchain</h1>
+  <h1>Verify manufacturer/owner and purchase good</h1>
 
   <div class="contentform">
     <div class="leftcontact">
 
     <div class="form-group">
-      <p>Current account: </p>
+      <h4>Current account: </h4>
         <select id="ethereum_address">
           <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 1: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
           <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 2: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
@@ -463,32 +497,66 @@ var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ether
       </div>
 
       <div class="form-group">
-        <p>Current smart contract: </p>
+        <h4>Current smart contract: </h4>
             <input type="text" name="smart_contract" id="smart_contract" placeholder="Enter smart contract address..."/>
             <button type="submit" onclick="changeContract();" class="bouton-contact">Change contract</button>
       </div>
 
       <div class="form-group">
-        <p>Get smart contract information: </p>
-          <textarea row="10" col="10" id="contract_information" name="contract_information"></textarea>
-          <button type="submit" onclick="verificationOfManAndLatestOwner();" class="bouton-contact">Get information</button>
+      <h4>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</h4>
+        <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
+    <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
       </div>
-
+      <div class="form-group">
+        <button type="submit" id="btn_get_ownership" onclick="sendEthertoContract();" class="bouton-contact">Get ownership</button>
+      </div>
   </div>
 
   <div class="rightcontact">
+    <div class="form-group">
+      <h4>Certificate information: </h4>
+        <p>Manufacturer verification</p>
+        <input type="text" id="verified" disabled="true"/>
+      </br>
+      </br>
+      </br>
+        <p>Latest Owner</p>
+        <input type="text" id="latest_owner" disabled="true"/>
+      </br>
+      </br>
+      </br>
+        <p>Model</p>
+        <input type="text" id="model" disabled="true"/>
+      </br>
+      </br>
+      </br>
+        <p>Status</p>
+        <input type="text" id="status" disabled="true"/>
+      </br>
+      </br>
+      </br>
+        <p>Date Manufactured</p>
+        <input type="text" id="date_manufactured" disabled="true"/>
+      </br>
+      </br>
+      </br>
+      <p>Number of owners</p>
+      <input type="text" id="no_owners" disabled="true"/>
+      </br>
+      </br>
+      </br>
+      <p>List of owners</p>
+      <textarea row="4" col="10" id="list_owners" name="contract_information"></textarea>
+    </div>
 
-    <div class="form-group">
-    <p>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</p>
-      <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
-  <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
-    </div>
-    <div class="form-group">
-      <button type="submit" onclick="sendEthertoContract();" class="bouton-contact">Transfer ownership</button>
-    </div>
 
   </div>
 
 </div>
+
+<script>
+document.getElementById("ethereum_contract_address").disabled=true;
+document.getElementById("btn_get_ownership").disabled=true;
+</script>
 </body>
 </html>

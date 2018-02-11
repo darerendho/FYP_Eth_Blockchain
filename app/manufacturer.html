@@ -359,14 +359,28 @@
 //     $('#datetimepicker1').datetimepicker();
 // });
 
+
 var contract_address,contract;
 
 //Change the contract being worked on
 function workOnContract(){
   contract_address = document.getElementById("contract_address").value;
   contract  = contract_abi.at(contract_address);
+  var validate = contract.getCurrentOwner();
+  if(web3.eth.defaultAccount == validate){
   alert("Contract changed to "+contract_address);
-}
+  document.getElementById("transfer_ownership").disabled=false;
+  document.getElementById("model").disabled=false;
+  document.getElementById("status").disabled=false;
+  document.getElementById("ethereum_trans_address").disabled=false;
+  document.getElementById("date_manufactured").disabled=false;
+  document.getElementById("addinfobutton").disabled=false;
+  }
+  else{
+    document.getElementById("contract_address").value="";
+    alert("Address is either invalid smart contract address or you do not own own contract");
+  }
+}//end of workOnContract
 
 //Add basic information about the Certificate of Authtenticity
 function addInfoContract(){
@@ -433,8 +447,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
 </header>
 <body>
 <h1>Proof-of-Existence goods authentication</h1>
-  <h1>Deploy a goods smart contract into an Ethereum Blockchain</h1>
-  <h1> Manufacturer owner is 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
+  <h1> Manufacturer Ethereum address: 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
 <div class="contentform">
   <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
@@ -473,7 +486,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
             <div class="validation"></div>
   </div>
   <div class="form-group">
-    <button type="submit" onclick="addInfoContract();" class="bouton-contact">Add contract information</button>
+    <button type="submit" id="addinfobutton" onclick="addInfoContract();" class="bouton-contact">Add contract information</button>
   </div>
 
 </div>
@@ -539,6 +552,12 @@ $("#text_qr_code").
 			makeCode();
 		}
 	});
+  document.getElementById("ethereum_trans_address").disabled=true;
+  document.getElementById("transfer_ownership").disabled=true;
+  document.getElementById("model").disabled=true;
+  document.getElementById("status").disabled=true;
+  document.getElementById("date_manufactured").disabled=true;
+  document.getElementById("addinfobutton").disabled=true;
 </script>
 
 </body>
