@@ -439,13 +439,44 @@ function changeContract(){
 // }//end verificationOfManAndLatestOwner
 
 //Transfer ether to the contract to receive ownership
-function sendEthertoContract(){
-var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
+function sendEthertoContract(){                         // TODO: owned/stolen , do not allow transfer of certifcate of authentication
+  if(ethereum_address != contract.getCurrentOwner()){   //If EO is not the current owner && Tis not owned
+    var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
          value:web3.toWei(5, "ether")}
        );
-       var new_owner = contract.getCurrentOwner();
-       alert("The tx hash "+payment_tx+".\nOwnership of smart contract "+contract_address+" transferred to "+new_owner+".");
+       web3.eth.getTransactionReceipt(payment_tx,function(err,res){
+         if(err){
+           console.log(err);
+         }
+         else{
 
+           var new_owner = contract.getCurrentOwner();
+           var blockhash = res.blockHash;
+           var blocknumber = res.blockNumber;
+
+           alert("TxHash:\t "+payment_tx+"\nBlock Hash:\t "+blockhash+"\nBlock Height:\t "+blocknumber+"\nFrom:\t "+ethereum_address+"\nTo:\t "+contract_address+"\nValue:\t 5\n");
+           document.getElementById("transaction_hash").value = payment_tx;
+            }
+          });
+
+  }
+else{
+  alert("You already own the certificate of authentication.");
+}
+
+//        var new_owner = contract.getCurrentOwner();
+//        alert("TxHash:\t"+payment_tx+"\n"
+//              "TxReceipt Status:\t"+success+"\n"
+//              "Block Height:\t"+success+"\n"
+//              "TimeStamp:\t"+time+"\n"
+//              "From:\t"+contract_address+"\n"
+//              "To:\t"+new_owner+"\n"
+//              "Value:\t"+value+"\n"
+//              "Gas Limit:\t"+glimit+"\n"
+//              "Gas Used By Txn:\t"+gused+"\n"
+//              "Actual Tx Cost/Fee:\t"+fee+"\n");
+//
+// document.getElementById("transaction_hash").value = payment_tx;
 }//end sendEtherForContract
   </script>
 </head>
@@ -505,9 +536,8 @@ var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ether
       <div class="form-group">
       <h4>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</h4>
         <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
-    <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
-      </div>
-      <div class="form-group">
+        <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
+        <input type="text" name="transaction_hash" id="transaction_hash" placeholder="Transaction Hash"/>
         <button type="submit" id="btn_get_ownership" onclick="sendEthertoContract();" class="bouton-contact">Get ownership</button>
       </div>
   </div>

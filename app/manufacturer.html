@@ -369,6 +369,7 @@ function workOnContract(){
   var validate = contract.getCurrentOwner();
   if(web3.eth.defaultAccount == validate){
   alert("Contract changed to "+contract_address);
+  document.getElementById("text_qr_code").value = contract_address
   document.getElementById("transfer_ownership").disabled=false;
   document.getElementById("model").disabled=false;
   document.getElementById("status").disabled=false;
@@ -453,7 +454,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
 
  <div class="leftcontact">
    <div class="form-group">
-   <p>Smart Contract : <span>*</span></p>
+   <h4>Smart Contract : <span>*</span></h4>
    <span class="icon-case"><i class="fa fa-map-marker"></i></span>
      <input type="text"  id="contract_address" data-rule="required" data-msg="Enter an Ethereum address before beginning"/>
              <div class="validation"></div>
@@ -464,14 +465,14 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
    </div>
 
   <div class="form-group">
-    <p>Model : <span>*</span></p>
+    <h4>Model : </h4>
      <span class="icon-case"><i class="fa fa-user"></i></span>
     <input type="text" name="model" id="model" data-rule="required" data-msg="Please enter a model number before submiting"/>
             <div class="validation"></div>
   </div>
 
   <div class="form-group">
-    <p>Status : <span>*</span></p>
+    <h4>Status :</h4>
      <span class="icon-case"><i class="fa fa-user"></i></span>
        <select id="status">
          <option value = "Available"> Available </option>
@@ -480,7 +481,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
   </div>
 
   <div class="form-group">
-  <p>Date manufactured : <span>*</span></p>
+  <h4>Date manufactured :</h4>
   <span class="icon-case"><i class="fa fa-location-arrow"></i></span>
     <input id="date_manufactured" type="text" data-rule="required" data-msg="Please add the date that item is manufactured"/>
             <div class="validation"></div>
@@ -494,7 +495,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
 <div class="rightcontact">
 
     <div>
-    <p>Generate QR code for contract address</p>
+    <h4>Generate QR code for contract address</h4>
     <input type="text" id="text_qr_code" placeholder="Enter an Ethereum smart contract address here"fa  style="width:80%"/>
     <div id="qrcode" style="width:100px; height:100px; margin-top:15px;"></div>
     </div>
@@ -503,7 +504,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
   </br>
 
   <div class="form-group">
-  <p>Transfer Ownership : <span>*</span></p>
+  <h4>Transfer Ownership :</h4>
       <select id="ethereum_trans_address">
         <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">User 1: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
         <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 2: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
