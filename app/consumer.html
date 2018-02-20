@@ -8,6 +8,7 @@
   <script src="./javascripts/bootstrap.min.js"></script>
   <script src="./javascripts/web3.js"></script>
   <script src="./javascripts/qrcode.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
 
@@ -361,7 +362,7 @@ var contract_address; //contract address
 function changeAccount(){
 account = document.getElementById('ethereum_address').value;
 web3.eth.defaultAccount = account;
-alert("User changed to "+account);
+swal("User changed",account);
 }
 
 //Change the contract being worked on
@@ -377,16 +378,16 @@ function workOnContract(){
     document.getElementById("text_qr_code").value = contract_address;
 
 
-      alert("Working on smart contract "+contract_address);
+      swal("Working contract address" ,+contract_address);
   }
   else{
-    alert("You do not own the contract "+contract_address+ " owner is " +current_owner +".");
+    swal("You do not own the contract "+contract_address+ " owner is " +current_owner +".");
   }
 
 }//end of workOnContract
 
 //Validate the the original owner belong to a manufacturer
-function contractOwner(){
+function contractOwner(){       // Need to do this?
 contract.getManufacturer(function(error,manufacturer){
   if(!error){
     if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
@@ -426,31 +427,93 @@ contract.transferOwnership.sendTransaction(transfer_address,{
 });
 
 var _current_owner = contract.getCurrentOwner();
-alert("The owner has been changed to "+_current_owner);
+swal("The owner has been changed to "+_current_owner);
 
 }
 
 //Change status of  the item from Available OR Stolen
 //Stolen attribute can only be changed by the contract owner
 function changeStatus(){
-var status = web3.fromAscii(document.getElementById("status").value);
-
-contract.setStatus.sendTransaction(status,{
-  from:account,
-  gas:4000000
+//var status = web3.fromAscii(document.getElementById("status").value);
+var status = document.getElementById("status").value;
+if(status.localeCompare("Available")){
+  swal({
+    text:"You are setting your contract to Available there by making your purchaseable.",
+    icon: "info",
+    button:true,
+    dangermode: false,
+  }).then((willChangeStatus) =>{
+  if(willChangeStatus){
+    contract.setStatus.sendTransaction(status,{
+      from:account,
+      gas:4000000
+    });
+    swal("The status has been changed to " +retrieved_information,{icon:"success",});
+  }
+  else{
+    swal("Status remain the same.");
+  }
 });
 
-contract.getStatus(function(error,status){
-if(!error){
-alert("The status has been changed to " +web3.toAscii(status));
+}
+else if(status.localCompare("Owned")){
+  swal({
+    text:"You are setting your contract to Owned there by preventing anyone from gaining it.",
+    icon: "info",
+    button:true,
+    dangermode: false,
+  }).then((willChangeStatus) =>{
+  if(willChangeStatus){
+    contract.setStatus.sendTransaction(status,{
+      from:account,
+      gas:4000000
+    });
+    swal("The status has been changed to " +retrieved_information,{icon:"success",});
+  }
+  else{
+    swal("Status remain the same.");
+  }
+});
+
 }
 else{
-  console.log(error);
-}
+  swal({
+    text:"You are setting your contract to Stolen there by alert other users no to purchase it.",
+    icon: "warning",
+    button:true,
+    dangermode: true,
+  }).then((willChangeStatus) =>{
+  if(willChangeStatus){
+    contract.setStatus.sendTransaction(status,{
+      from:account,
+      gas:4000000
+    });
+    swal("The status has been changed to " +retrieved_information,{icon:"success",});
+  }
+  else{
+    swal("Status remain the same.");
+  }
 });
 
-var ether_balance = web3.fromWei(web3.eth.getBalance(account));
-alert("Contract is owner by "+owner+". \nYour ether balance is now "+ether_balance);
+}
+// contract.setStatus.sendTransaction(status,{
+//   from:account,
+//   gas:4000000
+// });
+
+// contract.getStatus(function(error,status){
+// if(!error){
+// var retrieved_information = web3.toAscii(status);
+//
+// swal("The status has been changed to " +retrieved_information);
+// }
+// else{
+//   swal("Change not succesful");
+// }
+// });
+
+// var ether_balance = web3.fromWei(web3.eth.getBalance(account));
+// alert("Contract is owner by "+owner+". \nYour ether balance is now "+ether_balance);
 }//end getContractEther
 
   </script>

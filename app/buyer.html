@@ -439,8 +439,12 @@ function changeContract(){
 // }//end verificationOfManAndLatestOwner
 
 //Transfer ether to the contract to receive ownership
-function sendEthertoContract(){                         // TODO: owned/stolen , do not allow transfer of certifcate of authentication
-  if(ethereum_address != contract.getCurrentOwner()){   //If EO is not the current owner && Tis not owned
+function sendEthertoContract(){
+  var stolen = "Stolen";
+  var owned  = "Owned";
+  var get_status = web3.toAscii(contract.getStatus());
+
+  if(ethereum_address != contract.getCurrentOwner() && stolen.localeCompare(get_status) != 0 && owned.localeCompare(get_status) != 0){   //If EO is not the current owner && Tis not owned
     var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
          value:web3.toWei(5, "ether")}
        );
@@ -449,7 +453,6 @@ function sendEthertoContract(){                         // TODO: owned/stolen , 
            console.log(err);
          }
          else{
-
            var new_owner = contract.getCurrentOwner();
            var blockhash = res.blockHash;
            var blocknumber = res.blockNumber;
@@ -461,22 +464,16 @@ function sendEthertoContract(){                         // TODO: owned/stolen , 
 
   }
 else{
-  alert("You already own the certificate of authentication.");
+  if(stolen.localeCompare(get_status) == 0){
+    alert("This good is stolen from the orginal owner.\n DO NOT PURCHASE AND REPORT TO AUTHORITIES");
+  }
+  else if(owned.localeCompare(get_status) == 0){
+    alert("The good is currently owned and not available for purchase");
+  }
+  else{
+      alert("You already own the certificate of authentication.");
+  }
 }
-
-//        var new_owner = contract.getCurrentOwner();
-//        alert("TxHash:\t"+payment_tx+"\n"
-//              "TxReceipt Status:\t"+success+"\n"
-//              "Block Height:\t"+success+"\n"
-//              "TimeStamp:\t"+time+"\n"
-//              "From:\t"+contract_address+"\n"
-//              "To:\t"+new_owner+"\n"
-//              "Value:\t"+value+"\n"
-//              "Gas Limit:\t"+glimit+"\n"
-//              "Gas Used By Txn:\t"+gused+"\n"
-//              "Actual Tx Cost/Fee:\t"+fee+"\n");
-//
-// document.getElementById("transaction_hash").value = payment_tx;
 }//end sendEtherForContract
   </script>
 </head>

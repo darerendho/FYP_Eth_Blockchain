@@ -9,6 +9,7 @@
   <script src="./javascripts/bootstrap.js"></script>
   <script src="./javascripts/web3.js"></script>
   <script src="./javascripts/qrcode.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <!-- <script src="./javascripts/bootstrap-datetimepicker.js"></script> -->
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
@@ -368,7 +369,7 @@ function workOnContract(){
   contract  = contract_abi.at(contract_address);
   var validate = contract.getCurrentOwner();
   if(web3.eth.defaultAccount == validate){
-  alert("Contract changed to "+contract_address);
+  swal("Contract changed to ","Address: "+contract_address);
   document.getElementById("text_qr_code").value = contract_address
   document.getElementById("transfer_ownership").disabled=false;
   document.getElementById("model").disabled=false;
@@ -379,7 +380,7 @@ function workOnContract(){
   }
   else{
     document.getElementById("contract_address").value="";
-    alert("Address is either invalid smart contract address or you do not own own contract");
+    swal("Error","Address is either invalid smart contract address or you do not own own contract","warning");
   }
 }//end of workOnContract
 
@@ -407,20 +408,43 @@ var tx_hash_1 = contract.addNewGoods.sendTransaction(model,status,date_manufactu
   var _status = web3.toAscii(contract.getStatus());
   var _date_manufactured = web3.toAscii(contract.getDateManufactured());
 
-  alert("Transaction hash:"+tx_hash_1+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured);
+  swal("Information added","Transaction hash:"+tx_hash_1+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
 }
 
 //Transfer ownership of smart contract(Certificate of Authtenticity)
 function transferOwnership(){
 var transfer_address = document.getElementById("ethereum_trans_address").value;
-var tx_hash = contract.transferOwnership.sendTransaction(transfer_address,{
-    from:web3.eth.accounts[0],
-    gas:4000000
-});
 
-var _current_owner = contract.getCurrentOwner();
-alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to "+_current_owner);
-}
+
+
+
+swal({
+    title: "You are transfering certifaction ownership",
+    text: "Once transfered to another entity you will not be able to regain ownership of smart contract",
+    icon: "warning",
+    buttons:true,
+    dangermode: true,
+  })
+  .then((willTransfer) => {
+
+    if(willTransfer){
+      var tx_hash = contract.transferOwnership.sendTransaction(transfer_address,{
+          from:web3.eth.accounts[0],
+          gas:4000000
+      });
+
+      var _current_owner = contract.getCurrentOwner();
+
+      swal("Your ownership has been transfered to " +_current_owner,{
+        icon:"success",
+      });
+    }else{
+      swal("Ownership retained");
+    }
+  });
+}//end of transfer ownnership
+// swal("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to "+_current_owner);
+
 
   </script>
 </head>
@@ -448,7 +472,7 @@ alert("Transaction hash :"+tx_hash+"\nThe smart contract has been transferred to
 </header>
 <body>
 <h1>Proof-of-Existence goods authentication</h1>
-  <h1> Manufacturer Ethereum address: 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
+  <h1> Manufacturer</h1>
 <div class="contentform">
   <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
