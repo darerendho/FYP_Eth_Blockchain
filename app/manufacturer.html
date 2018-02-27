@@ -9,6 +9,7 @@
   <script src="./javascripts/bootstrap.js"></script>
   <script src="./javascripts/web3.js"></script>
   <script src="./javascripts/qrcode.js"></script>
+  <script src="./javascripts/contract.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <!-- <script src="./javascripts/bootstrap-datetimepicker.js"></script> -->
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
@@ -24,392 +25,141 @@
 }
 
   web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
-  var contract_abi = web3.eth.contract([
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_model",
-          "type": "bytes32"
-        },
-        {
-          "name": "_status",
-          "type": "bytes32"
-        },
-        {
-          "name": "_date_manufactured",
-          "type": "bytes32"
-        }
-      ],
-      "name": "addNewGoods",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getManufacturer",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "model",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_owner",
-          "type": "uint256"
-        }
-      ],
-      "name": "getOwnerByIndex",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "status",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_stats",
-          "type": "bytes32"
-        }
-      ],
-      "name": "setStatus",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "log_count",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "contract_owner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_buyer",
-          "type": "address"
-        }
-      ],
-      "name": "sendEther",
-      "outputs": [],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getStatus",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "owners_count",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_log",
-          "type": "bytes32"
-        }
-      ],
-      "name": "addRepairInfo",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "owners_list",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getModel",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getCurrentOwner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getNumberOfOwners",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "date_manufactured",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getPreviousOwner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "repairs",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_transfer_owner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getDateManufactured",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    }
-  ]);
 
-//Smart Contract deployed on the blockchain
-// $(function () {
-//     $('#datetimepicker1').datetimepicker();
-// });
-
-
-var contract_address,contract;
+var contract_address // Contract Address
+var contract; // Contract instance
+var contract_abi =web3.eth.contract(contractABI);
+//web3.eth.contract(contract_abi); // contract ABI
 
 //Change the contract being worked on
 function workOnContract(){
   contract_address = document.getElementById("contract_address").value;
   contract  = contract_abi.at(contract_address);
-  var validate = contract.getCurrentOwner();
-  if(web3.eth.defaultAccount == validate){
-  swal("Contract changed to ","Address: "+contract_address);
-  document.getElementById("text_qr_code").value = contract_address
-  document.getElementById("transfer_ownership").disabled=false;
-  document.getElementById("model").disabled=false;
-  document.getElementById("status").disabled=false;
-  document.getElementById("ethereum_trans_address").disabled=false;
-  document.getElementById("date_manufactured").disabled=false;
-  document.getElementById("addinfobutton").disabled=false;
-  }
-  else{
-    document.getElementById("contract_address").value="";
-    swal("Error","Address is either invalid smart contract address or you do not own own contract","warning");
-  }
+  var validate;
+   contract.getCurrentOwner(function(err,res){
+    if(err){
+      console.warn(err);
+    }
+      else{
+        if(web3.eth.defaultAccount == res){
+        swal("Contract changed to ","Address: "+contract_address);
+        document.getElementById("text_qr_code").value = contract_address
+        document.getElementById("transfer_ownership").disabled=false;
+        document.getElementById("model").disabled=false;
+        document.getElementById("status").disabled=false;
+        document.getElementById("ethereum_trans_address").disabled=false;
+        document.getElementById("date_manufactured").disabled=false;
+        document.getElementById("addinfobutton").disabled=false;
+        }
+        else{
+          document.getElementById("contract_address").value="";
+          swal("Error","Address is either invalid smart contract address or you do not own own contract","warning");
+        }
+      }
+
+
+  });
+  // if(web3.eth.defaultAccount == validate){
+  // swal("Contract changed to ","Address: "+contract_address);
+  // document.getElementById("text_qr_code").value = contract_address
+  // document.getElementById("transfer_ownership").disabled=false;
+  // document.getElementById("model").disabled=false;
+  // document.getElementById("status").disabled=false;
+  // document.getElementById("ethereum_trans_address").disabled=false;
+  // document.getElementById("date_manufactured").disabled=false;
+  // document.getElementById("addinfobutton").disabled=false;
+  // }
+  // else{
+  //   document.getElementById("contract_address").value="";
+  //   swal("Error","Address is either invalid smart contract address or you do not own own contract","warning");
+  // }
 }//end of workOnContract
 
 //Add basic information about the Certificate of Authtenticity
 function addInfoContract(){
+var tx_hash;
+var _model,_status,_date_manufactured;
 
 var model = web3.fromAscii(document.getElementById("model").value);
 var status = web3.fromAscii(document.getElementById("status").value);
 var date_manufactured = web3.fromAscii(document.getElementById("date_manufactured").value);
-var tx_hash_1 = contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
+
+contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
     from:web3.eth.accounts[0],
-         gas:4000000,
-         function(error,result){
+    gas:4000000,
+
+},         function(error,result){
            if(error){
-             console.log(error);
+             //console.log(error);
            }
            else{
-             console.log(result);
+             tx_hash = result;
+             contract.getModel(function(err,res){
+               if(err){
+                 swal(err);
+               }
+               else{
+                 _model = web3.toAscii(res);
+                 contract.getStatus(function(err,res1){
+                   if(err){
+                     swal(err);
+                     }
+                     else{
+                       _status = web3.toAscii(res1);
+                       contract.getDateManufactured(function(err,res2){
+                         if(err){
+                           swal(err);
+                         }
+                         else{
+                           _date_manufactured = web3.toAscii(res2);
+                           swal("Information added","Transaction hash:"+tx_hash+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
+                         }
+                       });
+                     }
+                 });
+               }
+
+             });
            }
          }
-});
 
+);
+
+
+
+// contract.getModel(function(err,res){
+//   if(err){
+//     swal(err);
+//   }
+//   else{
+//     _model = web3.toAscii(res);
+//     contract.getStatus(function(err,res1){
+//       if(err){
+//         swal(err);
+//         }
+//         else{
+//           _status = web3.toAscii(res1);
+//           contract.getDateManufactured(function(err,res2){
+//             if(err){
+//               swal(err);
+//             }
+//             else{
+//               _date_manufactured = web3.toAscii(res2);
+//               swal("Information added","Transaction hash:"+tx_hash+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
+//             }
+//           });
+//         }
+//     });
+//   }
+//
+// });
   //Read the previously written information from the smart contract
-  var _model = web3.toAscii(contract.getModel());
-  var _status = web3.toAscii(contract.getStatus());
-  var _date_manufactured = web3.toAscii(contract.getDateManufactured());
+  // var _model = web3.toAscii(contract.getModel());
+  // var _status = web3.toAscii(contract.getStatus());
+  // var _date_manufactured = web3.toAscii(contract.getDateManufactured());
 
-  swal("Information added","Transaction hash:"+tx_hash_1+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
-}
+
+}//end addInfoContract
 
 //Transfer ownership of smart contract(Certificate of Authtenticity)
 function transferOwnership(){

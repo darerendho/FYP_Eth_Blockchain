@@ -1,4 +1,4 @@
-<!doctype HTML>
+<!DOCTYPE HTML>
 <html>
 <head>
   <title>Luxcure - Buyer</title>
@@ -7,6 +7,8 @@
   <script src="./javascripts/tether.js"></script>
   <script src="./javascripts/bootstrap.min.js"></script>
   <script src="./javascripts/web3.js"></script>
+  <script src="./javascripts/contract.js"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
   <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
 
@@ -19,344 +21,14 @@ web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
 //Add text field to change account buyer for web3 eth address
 
-var contract_abi = web3.eth.contract([
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_model",
-        "type": "bytes32"
-      },
-      {
-        "name": "_status",
-        "type": "bytes32"
-      },
-      {
-        "name": "_date_manufactured",
-        "type": "bytes32"
-      }
-    ],
-    "name": "addNewGoods",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getManufacturer",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "model",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "_owner",
-        "type": "uint256"
-      }
-    ],
-    "name": "getOwnerByIndex",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "status",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_stats",
-        "type": "bytes32"
-      }
-    ],
-    "name": "setStatus",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "log_count",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "contract_owner",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_buyer",
-        "type": "address"
-      }
-    ],
-    "name": "sendEther",
-    "outputs": [],
-    "payable": true,
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getStatus",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "owners_count",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_log",
-        "type": "bytes32"
-      }
-    ],
-    "name": "addRepairInfo",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "owners_list",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getModel",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getCurrentOwner",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getNumberOfOwners",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "date_manufactured",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getPreviousOwner",
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "repairs",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_transfer_owner",
-        "type": "address"
-      }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getDateManufactured",
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  }
-]);
 var ethereum_address;
 var contract;
-
+var contract_abi =web3.eth.contract(contractABI);
 //Use the current ethereum user (No need private key)
 function changeEthereumAddress(){
 ethereum_address = document.getElementById("ethereum_address").value;
 web3.eth.defaultAccount = ethereum_address;
-alert("Changed the user to "+ethereum_address);
+swal("User changed to",ethereum_address);
 }//end changeEthereumAddress
 
 //Change the contract address
@@ -365,7 +37,7 @@ function changeContract(){
   contract  = contract_abi.at(contract_address);
   contract.getManufacturer(function(err,res){
     if(res){
-      alert("Working on smart contract "+contract_address);
+      swal("Working on contract address ",contract_address);
       document.getElementById("ethereum_contract_address").value = contract_address;
       document.getElementById("btn_get_ownership").disabled=false;
 
@@ -393,9 +65,16 @@ function changeContract(){
     document.getElementById("date_manufactured").value =  date_manufactured;
     document.getElementById("no_owners").value = no_owners;
     document.getElementById("list_owners").value = list;
+
+    var purchased =contract.purchase();
+    if(purchased){
+      document.getElementById("btn_get_ownership").disabled=false;
+      document.getElementById("btn_acceptdelivery").disabled=true;
+    }
+
     }
     else{
-      alert("Invalid smart contract entered, please re-enter.")
+      swal("Invalid smart contract entered, please re-enter.")
     }
   });
 
@@ -439,42 +118,101 @@ function changeContract(){
 // }//end verificationOfManAndLatestOwner
 
 //Transfer ether to the contract to receive ownership
+
 function sendEthertoContract(){
   var stolen = "Stolen";
   var owned  = "Owned";
   var get_status = web3.toAscii(contract.getStatus());
+  var web
+//TODO: Set alert before transfer of ether and retrieve the price set by the current contract owner
+//If EO is not the current owner && not stolen && not owned
+  if(ethereum_address != contract.getCurrentOwner() && stolen.localeCompare(get_status) != 0 && owned.localeCompare(get_status) != 0){
+    var cost = contract.cost();
 
-  if(ethereum_address != contract.getCurrentOwner() && stolen.localeCompare(get_status) != 0 && owned.localeCompare(get_status) != 0){   //If EO is not the current owner && Tis not owned
-    var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
-         value:web3.toWei(5, "ether")}
-       );
-       web3.eth.getTransactionReceipt(payment_tx,function(err,res){
-         if(err){
-           console.log(err);
-         }
-         else{
-           var new_owner = contract.getCurrentOwner();
-           var blockhash = res.blockHash;
-           var blocknumber = res.blockNumber;
+    swal({
+      title:"You are about the send ether to obtain a good/smart contract you wish purchase",
+      text: "The cost of the good is "+cost+" Ether.",
+      icon:"info",
+      buttons:true,
+      dangermode:true,
+    }).then((willSendEther)=> {
+      if(willSendEther){
+        var payment_tx = contract.sendEther.sendTransaction(ethereum_address,{from:ethereum_address,
+             value:web3.toWei(cost, "ether")}
+           );
 
-           alert("TxHash:\t "+payment_tx+"\nBlock Hash:\t "+blockhash+"\nBlock Height:\t "+blocknumber+"\nFrom:\t "+ethereum_address+"\nTo:\t "+contract_address+"\nValue:\t 5\n");
-           document.getElementById("transaction_hash").value = payment_tx;
-            }
-          });
+                     web3.eth.getTransactionReceipt(payment_tx,function(err,res){
+                       if(err){
+                         console.log(err);
+                       }
+                       else{
+                         var new_owner = contract.getCurrentOwner();
+                         var blockhash = res.blockHash;
+                         var blocknumber = res.blockNumber;
+
+                         swal("TxHash:\t "+payment_tx+"\nBlock Hash:\t "+blockhash+"\nBlock Height:\t "+blocknumber+"\nFrom:\t "+ethereum_address+"\nTo:\t "+contract_address+"\nValue:\t"+cost+"\n");
+                         document.getElementById("transaction_hash").value = payment_tx;
+                          }
+                          });
+
+    document.getElementById("btn_acceptdelivery").disabled=false;
+      }
+      else{
+        swal("Ether not sent")
+      }
+
+
+    });
 
   }
 else{
   if(stolen.localeCompare(get_status) == 0){
-    alert("This good is stolen from the orginal owner.\n DO NOT PURCHASE AND REPORT TO AUTHORITIES");
+    swal("This good is stolen from the orginal owner.\n DO NOT PURCHASE AND REPORT TO AUTHORITIES");
   }
   else if(owned.localeCompare(get_status) == 0){
-    alert("The good is currently owned and not available for purchase");
+    swal("The good is currently owned and not available for purchase");
   }
   else{
-      alert("You already own the certificate of authentication.");
+      swal("You already own this smart contract.");
   }
 }
 }//end sendEtherForContract
+
+//Upon delivered to user accept good, verify and accept good
+function acceptDelivery(){
+  swal({
+      title: "You are accepting the delivery of good and verified the authenticity",
+      text: "Once complete, funds will be transferred to seller and ownership will be gained.",
+      icon: "warning",
+      buttons:true,
+      dangermode: true,
+    })
+    .then((willAccept) => {
+
+      if(willAccept){
+        var tx_hash = contract.acceptDelivery.sendTransaction(true,{
+            from:ethereum_address,
+            gas:4000000
+        });
+
+        var _current_owner = contract.getCurrentOwner();
+
+        swal("Txhash: "+tx_hash,"Your ownership has been transfered to " +_current_owner+" and funds transferred to seller ",{
+          icon:"success",
+        });
+      }
+      else{
+        var tx_hash = contract.acceptDelivery.sendTransaction(false,{
+            from:ethereum_address,
+            gas:4000000
+        });
+        swal({
+          title:"Funds have been refunded back to you",
+          text: "TxHash: "+tx_hash
+        });
+      }
+    });
+}//end acceptDelivery
   </script>
 </head>
 <header>
@@ -525,7 +263,7 @@ else{
       </div>
 
       <div class="form-group">
-        <h4>Current smart contract: </h4>
+        <h4>Current Smart Contract: </h4>
             <input type="text" name="smart_contract" id="smart_contract" placeholder="Enter smart contract address..."/>
             <button type="submit" onclick="changeContract();" class="bouton-contact">Change contract</button>
       </div>
@@ -533,9 +271,10 @@ else{
       <div class="form-group">
       <h4>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</h4>
         <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
-        <!--    <input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." /> -->
+        <!--<input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." />-->
         <input type="text" name="transaction_hash" id="transaction_hash" placeholder="Transaction Hash"/>
-        <button type="submit" id="btn_get_ownership" onclick="sendEthertoContract();" class="bouton-contact">Get ownership</button>
+        <button type="submit" id="btn_get_ownership" onclick="sendEthertoContract();" class="bouton-contact">Transfer funds</button>
+        <button type="submit" id="btn_acceptdelivery" onclick="acceptDelivery();" class="bouton-contact">Accept good</button>
       </div>
   </div>
 
@@ -584,6 +323,7 @@ else{
 <script>
 document.getElementById("ethereum_contract_address").disabled=true;
 document.getElementById("btn_get_ownership").disabled=true;
+document.getElementById("btn_acceptdelivery").disabled=true;
 </script>
 </body>
 </html>
