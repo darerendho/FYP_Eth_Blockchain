@@ -1,4 +1,4 @@
-var contractABI= [
+var contractABI=[
 	{
 		"constant": false,
 		"inputs": [
@@ -16,12 +16,7 @@ var contractABI= [
 			}
 		],
 		"name": "addNewGoods",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -62,25 +57,6 @@ var contractABI= [
 			{
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "_owner",
-				"type": "uint256"
-			}
-		],
-		"name": "getOwnerByIndex",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
 			}
 		],
 		"payable": false,
@@ -144,6 +120,34 @@ var contractABI= [
 		"type": "function"
 	},
 	{
+		"constant": true,
+		"inputs": [],
+		"name": "getPurchased",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getDeliveryCost",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"constant": false,
 		"inputs": [
 			{
@@ -152,6 +156,24 @@ var contractABI= [
 			}
 		],
 		"name": "sendEther",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_cost",
+				"type": "uint256"
+			},
+			{
+				"name": "_delivery_service",
+				"type": "address"
+			}
+		],
+		"name": "deliveryCharge",
 		"outputs": [],
 		"payable": true,
 		"stateMutability": "payable",
@@ -208,14 +230,9 @@ var contractABI= [
 			}
 		],
 		"name": "acceptDelivery",
-		"outputs": [
-			{
-				"name": "success",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -227,6 +244,39 @@ var contractABI= [
 			}
 		],
 		"name": "owners_list",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "delivery_depo",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "delivery_service",
 		"outputs": [
 			{
 				"name": "",
@@ -254,6 +304,20 @@ var contractABI= [
 	{
 		"constant": true,
 		"inputs": [],
+		"name": "getOwners",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
 		"name": "getCurrentOwner",
 		"outputs": [
 			{
@@ -269,6 +333,20 @@ var contractABI= [
 		"constant": true,
 		"inputs": [],
 		"name": "getNumberOfOwners",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getCost",
 		"outputs": [
 			{
 				"name": "",
@@ -356,21 +434,11 @@ var contractABI= [
 	},
 	{
 		"constant": false,
-		"inputs": [
-			{
-				"name": "_cost",
-				"type": "uint256"
-			}
-		],
-		"name": "specifyCost",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
+		"inputs": [],
+		"name": "deliveryChargeBuyer",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{

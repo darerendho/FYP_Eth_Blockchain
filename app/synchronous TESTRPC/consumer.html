@@ -22,53 +22,58 @@ web3 = new Web3(web3.currentProvider);
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 }
 
-//const ether = document.getElementById("eth").value;
+const ether = document.getElementById("eth").value;
 //const url = https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD; //Ethereum Price
 
-// var request = new XMLHttpRequest();
-// request.open('GET','https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD',true);
-//
-// request.onload = function(){
-//   var data = JSON.parse(this.response);
-//   var price = JSON.stringify(data);
-//   ether = price;
-// }
-// request.send();
+var request = new XMLHttpRequest();
+request.open('GET','https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD',true);
+
+request.onload = function(){
+  var data = JSON.parse(this.response);
+  var price = JSON.stringify(data);
+  ether = price;
+}
+request.send();
+
+
+
+
 
 //TODO: Should change to a drop downlist to retrieve goods you own base on ethereum address - need a db to associate user address to smart contract address
-web3.eth.defaultAccount = web3.eth.accounts[0];
-var ethereum_account = web3.eth.accounts[0]; //Account being used
+var account; //Account being used
 var contract; //Contract
 var contract_address; //contract address
 var contract_abi =web3.eth.contract(contractABI);
+//Change Exeternally Owned accounts
+function changeAccount(){
+account = document.getElementById('ethereum_address').value;
+web3.eth.defaultAccount = account;
+swal("User changed to",account);
+}//end change function
 
 //Change the contract being worked on
-async function workOnContract(){
+function workOnContract(){
   contract_address = document.getElementById("contract_address").value;
   contract  = contract_abi.at(contract_address);
-  var current_owner = await contract.getCurrentOwner(function(err,own){
-    if(err){
-      console.log(err);
-    }
-    else{
-      if(own == web3.eth.accounts[0]){
-        document.getElementById("ethereum_trans_address").disabled = false;
-        document.getElementById("btn_transfer").disabled = false;
-        document.getElementById("status").disabled = false;
-        document.getElementById("btn_status").disabled = false;
-        document.getElementById("text_qr_code").value = contract_address;
+  var current_owner = contract.getCurrentOwner();
+  if(current_owner == account){
+    document.getElementById("ethereum_trans_address").disabled = false;
+    document.getElementById("btn_transfer").disabled = false;
+    document.getElementById("status").disabled = false;
+    document.getElementById("btn_status").disabled = false;
+    document.getElementById("text_qr_code").value = contract_address;
 
-      swal("Working on contract address " ,contract_address);
-      }
-      else{
-        swal("Error!","You do not own the contract "+contract_address+ " owner is " +own+".");
-      }
-    }
-  });
+
+      swal("Working on contract address" ,contract_address);
+  }
+  else{
+    swal("Error!","You do not own the contract "+contract_address+ " owner is " +current_owner +".");
+  }
 
 }//end of workOnContract
 
-function contractOwner(){
+//Validate the the original owner belong to a manufacturer
+function contractOwner(){       // Need to do this?
 contract.getManufacturer(function(error,manufacturer){
   if(!error){
     if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
@@ -84,25 +89,28 @@ contract.getManufacturer(function(error,manufacturer){
 });
 }//end contractOwner
 
-//TODO: Need to fix this one
 //Get all owners from index 0 to latest
-// function getAllOwners(){
-// var no_of_people = contract.getNumberOfOwners();
-// var list = '';
-// for(index = 0; index < no_of_people; index++){
-// list += contract.getOwnerByIndex(index) + "\n";
-// }
-// var no_owners = contract.getNumberOfOwners();
-// var model = web3.toAscii(contract.getModel());
-// var status = web3.toAscii(contract.getStatus());
-// var date_manufactured = web3.toAscii(contract.getDateManufactured());
-// document.getElementById('owners').value = "The previous owners are (from first to last)\n"+list+"\nModel:"+model+"\nStatus: "+status+"\nDate Manufactured: "+date_manufactured+"\nTotal number of owners: "+no_owners;
-// //alert("The previous owners are (from first to last)\n"+list);
-// } // end getAllOwners
+function getAllOwners(){
+var no_of_people = contract.getNumberOfOwners();
+var list = '';
+for(index = 0; index < no_of_people; index++){
+list += contract.getOwnerByIndex(index) + "\n";
+}
+var no_owners = contract.getNumberOfOwners();
+var model = web3.toAscii(contract.getModel());
+var status = web3.toAscii(contract.getStatus());
+var date_manufactured = web3.toAscii(contract.getDateManufactured());
+document.getElementById('owners').value = "The previous owners are (from first to last)\n"+list+"\nModel:"+model+"\nStatus: "+status+"\nDate Manufactured: "+date_manufactured+"\nTotal number of owners: "+no_owners;
+//alert("The previous owners are (from first to last)\n"+list);
+} // end getAllOwners
 
 //Trasnfer ownership from current 2nd owner to 3rd owner
 function transferOwnership(){
 var transfer_address = document.getElementById("ethereum_trans_address").value;
+contract.transferOwnership.sendTransaction(transfer_address,{
+    from:account,
+    gas:4000000
+});
 
 swal({
     title: "You are transfering certifaction ownership",
@@ -117,16 +125,11 @@ swal({
       var tx_hash = contract.transferOwnership.sendTransaction(transfer_address,{
           from:web3.eth.accounts[0],
           gas:4000000
-      },function(err,hash){
-        if(err){
-          console.log(err);
-        }
-        else{
-          console.log(hash);
-        }
       });
 
-      swal("Your ownership has been transfered to " +transfer_address,{
+      var _current_owner = contract.getCurrentOwner();
+
+      swal("Your ownership has been transfered to " +_current_owner,{
         icon:"success",
       });
     }else{
@@ -138,76 +141,49 @@ swal({
 
 //Change status of  the item from Available OR Stolen
 //Stolen attribute can only be changed by the contract owner
-async function changeStatus(){
+function changeStatus(){
 var status = document.getElementById("status").value;
 var value = +document.getElementById("ether_value").value;
-var delivery_service = document.getElementById("delivery_service").value;
-var delivery_sym;
-switch(delivery_service){
-  case "0x4a924AeD785c1E83A48939Fcc8DdDa6B326a5F08": delivery_sym = "DHL"; break;
-  case "0x1aD5662a8b3C5883A097e52cCc3876Ce889E063D": delivery_sym = "UPS"; break;
-  case "0x1faBfcE5bdE932F1ee61e7E15fA6dF59bD8D11f6": delivery_sym = "FeDex"; break;
-  default: delivery_sym = "DHL";
-}
-var retrieved_information = await contract.getStatus(function(err,stats){
-  if(err){
-    console.log(err);
-  }
-  else{
-    retrieved_information = stats;
-  }
-});
-
-
-
+var retrieved_information = contract.getStatus();
 if(status.localeCompare("Available") == 0){
+
   if(Number.isInteger(value)){
     if(value > 0){
     swal({
-      text:"You are setting your contract to Available thereby making your good purchaseable at an offer price of "+value+" Ether and delivered by "+delivery_sym,
+      text:"You are setting your contract to Available thereby making your good purchaseable at an offer price of "+value+" Ether",
       icon: "info",
       buttons:true,
       dangermode: true,
     }).then((willChangeStatus) =>{
     if(willChangeStatus){
       //Set the status to availabe
-      contract.setStatus.sendTransaction(web3.fromAscii(status),{
-        from:ethereum_account,
-        gas:100000
-      },function(err,stats){
-        if(err){
-          console.log(err);
-        }
-        else{
-          //Set the accepted amount to transfer
-          var cost = contract.deliveryCharge.sendTransaction(value,delivery_service,{
-            from:ethereum_account,
-            value:web3.toWei(0.05, "ether"),
-            gas:200000
-          },function(err,res){
-            if(err){
-              console.log(err);
-            }
-            else{
-                   swal("The status has been changed to " +status+"\nPrice is set to " +value+" ether and delivery deposit of paid.",{icon:"success",});
-            }
-          });
-        }
+      contract.setStatus.sendTransaction(status,{
+        from:account,
+        gas:4000000
+      });
+      //Set the accepted amount to transfer
+      var cost = contract.specifyCost.sendTransaction(value,{
+        from:account,
+        gas:4000000
       });
 
+     retrieved_information = contract.getStatus();
+     swal("The status has been changed to " +retrieved_information+"\nPrice is set to " +value+" ether",{icon:"success",});
     }
     else{
-
-      swal("Status remains at "+web3.toAscii(retrieved_information));
+      retrieved_information = contract.getStatus();
+      swal("Status remains the "+retrieved_information);
     }
-  });//end then clause
-}//end if value > 0
+  });
+    }
     else{
       swal("Please enter a greater amount");
-    }//end else greater amount
-  }//end if it is an integer
-else{
-  swal("Please enter an ether amount "," e.g 4 Ether");
+    }
+
+  }
+
+  else{
+      swal("Please enter an ether amount "," e.g 4 Ether");
 }
 
 }//end if available
@@ -220,24 +196,18 @@ else if(status.localeCompare("Owned") == 0){
     dangermode: true,
   }).then((willChangeStatus) =>{
   if(willChangeStatus){
-    contract.setStatus.sendTransaction(web3.fromAscii(status),{
-      from:ethereum_account,
-      gas:100000
-    },function(err,res){
-      if(err){
-        console.log(err);
-      }
-      else{
-        swal("The status has been changed to " +status,{icon:"success",});
-      }
+    contract.setStatus.sendTransaction(status,{
+      from:account,
+      gas:4000000
     });
-
+     retrieved_information = web3.toAscii(contract.getStatus());
+    swal("The status has been changed to " +retrieved_information,{icon:"success",});
   }
   else{
-        swal("Status remains "+web3.toAscii(retrieved_information));
-
-    }
-  });
+    retrieved_information = web3.toAscii(contract.getStatus());
+    swal("Status remains "+retrieved_information);
+  }
+});
 
 }//end if owned
 
@@ -250,69 +220,40 @@ else{
     dangermode: true,
   }).then((willChangeStatus) =>{
   if(willChangeStatus){
-    contract.setStatus.sendTransaction(web3.fromAscii(status),{
-      from:ethereum_account,
-      gas:100000
-    },function(err,setstatus){
-      if(err){
-        console.log(err);
-      }
-      else{
-        swal("The status has been changed to " +status,{icon:"success",});
-      }
+    contract.setStatus.sendTransaction(status,{
+      from:account,
+      gas:4000000
     });
+    retrieved_information = web3.toAscii(contract.getStatus());
+    swal("The status has been changed to " +retrieved_information,{icon:"success",});
   }
   else{
-              swal("Status remains the "+web3.toAscii(retrieved_information));
-
+    retrieved_information = web3.toAscii(contract.getStatus());
+    swal("Status remains the "+retrieved_information);
 }
 });
 }//end if stolen
+
+// contract.setStatus.sendTransaction(status,{
+//   from:account,
+//   gas:4000000
+// });
+
+// contract.getStatus(function(error,status){
+// if(!error){
+// var retrieved_information = web3.toAscii(status);
+//
+// swal("The status has been changed to " +retrieved_information);
+// }
+// else{
+//   swal("Change not succesful");
+// }
+// });
+
+// var ether_balance = web3.fromWei(web3.eth.getBalance(account));
+// alert("Contract is owner by "+owner+". \nYour ether balance is now "+ether_balance);
+
 }//end getContractEther
-
-//Get all owners from index 0 to latest
-async function getAllOwners(){
-  var list ="",model,status,date_manufactured;
-  var owners = await contract.getOwners(function(err,owner){
-   if(err){
-     swal(err);
-   }
-   else{
-     for(var i =0;i<owner.length;i++)
-     {
-       list += owner[i] +"\n";
-     }
-     //document.getElementById("list_owners").value =  list;
-     no_owners= owner.length;
-     model =  contract.getModel(function(err,model_res){
-      if(err){
-
-      }
-      else{
-        model = web3.toAscii(model_res);
-        status = contract.getStatus(function(err,status_res){
-         if(err){
-           console.log(err);
-         }
-         else{
-           status = web3.toAscii(status_res);
-           date_manufactured  =  contract.getDateManufactured(function(err,res){
-            if(err){
-              console.log(err);
-            }
-            else{
-              document.getElementById('owners').value = "The previous owners are (from first to last)\n"+list+"\nModel:"+model+"\nStatus: "+status+"\nDate Manufactured: "+web3.toAscii(res)+"\nTotal number of owners: "+no_owners;
-            }
-
-          });
-         }
-       });
-      }
-    });
-   }
-   });
-
-} // end getAllOwners
 
   </script>
 </head>
@@ -340,13 +281,31 @@ async function getAllOwners(){
 </header>
 
 <body>
-  <h1>Proof-of-Existence Goods authentication</h1>
-  <h1> Manufacturer's Ethereum address: 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
+  <h1>Proof-of-Existence goods authentication</h1>
+  <h1> Manufacturer Ethereum address: 0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a</h1>
+  <h2>ETH price</h2><h2 id = "eth"></h2>
   <div class="contentform">
     <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
 
     <div class="leftcontact">
+      <div class="form-group">
+        <h4>Current account: </h4>
+          <select id="ethereum_address">
+            <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">User 1: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
+            <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 2: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
+            <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 3: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
+            <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">User 4: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
+            <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">User 5: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+            <option value = "0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed">User 6: 0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed</option>
+            <option value = "0x11af1cf9324e22e0028aa559e70c23e077e924ce">User 7: 0x11af1cf9324e22e0028aa559e70c23e077e924ce</option>
+            <option value = "0x43b464d9450a5cef57e63765197dc83691d92eec">User 8: 0x43b464d9450a5cef57e63765197dc83691d92eec</option>
+            <option value = "0x7a20e20fd8b785209fef40e0d7d4580b40183878">User 9: 0x7a20e20fd8b785209fef40e0d7d4580b40183878</option>
+          </select>
+
+          <button type="submit" onclick="changeAccount();" class="bouton-contact">Change Owner</button>
+        </div>
+
       <div class="form-group">
         <h4>Current Smart Contract: <span>*</span></h4>
          <span class="icon-case"><i class="fa fa-user"></i></span>
@@ -382,10 +341,15 @@ async function getAllOwners(){
     <div class="form-group">
     <h4>Transfer Ownership: </h4>
     <select id="ethereum_trans_address">
-      <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">DHL: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
-      <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">UPD: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
-      <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">FeDex: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
-      <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">Buyer: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+      <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">User 1: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
+      <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 2: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
+      <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 3: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
+      <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">User 4: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
+      <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">User 5: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+      <option value = "0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed">User 6: 0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed</option>
+      <option value = "0x11af1cf9324e22e0028aa559e70c23e077e924ce">User 7: 0x11af1cf9324e22e0028aa559e70c23e077e924ce</option>
+      <option value = "0x43b464d9450a5cef57e63765197dc83691d92eec">User 8: 0x43b464d9450a5cef57e63765197dc83691d92eec</option>
+      <option value = "0x7a20e20fd8b785209fef40e0d7d4580b40183878">User 9: 0x7a20e20fd8b785209fef40e0d7d4580b40183878</option>
     </select>
     </div>
 
@@ -400,11 +364,6 @@ async function getAllOwners(){
       <option value = "Available"> Available </option>
       <option value = "Owned"> Owned </option>
       <option value = "Stolen">Stolen </option>
-    </select>
-    <select id="delivery_service">
-        <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08"> DHL (fees:0.05 ether)</option>
-        <option value = "0x1aD5662a8b3C5883A097e52cCc3876Ce889E063D"> UPS (fees:0.05 )</option>
-        <option value = "0x1faBfcE5bdE932F1ee61e7E15fA6dF59bD8D11f6"> FeDex (fees:0.05 ether)</option>
     </select>
     <input type="text" name="ether_value" id="ether_value" data-rule="required" placeholder="Enter sell price"/>
     </div>

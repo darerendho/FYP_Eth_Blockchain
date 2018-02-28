@@ -53,7 +53,7 @@ function workOnContract(){
         }
         else{
           document.getElementById("contract_address").value="";
-          swal("Error","Address is either invalid smart contract address or you do not own the contract"+contract_address,"warning");
+          swal("Error","Address is either invalid smart contract address or you do not own own contract","warning");
         }
       }
 
@@ -76,7 +76,7 @@ function workOnContract(){
 }//end of workOnContract
 
 //Add basic information about the Certificate of Authtenticity
-async function addInfoContract(){
+function addInfoContract(){
 var tx_hash;
 var _model,_status,_date_manufactured;
 
@@ -84,24 +84,89 @@ var model = web3.fromAscii(document.getElementById("model").value);
 var status = web3.fromAscii(document.getElementById("status").value);
 var date_manufactured = web3.fromAscii(document.getElementById("date_manufactured").value);
 
-var add_promise = await contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
+contract.addNewGoods.sendTransaction(model,status,date_manufactured,{
     from:web3.eth.accounts[0],
     gas:4000000,
-},function(err,result){
-           if(err){
-             swal(err);
+
+},         function(error,result){
+           if(error){
+             //console.log(error);
            }
            else{
              tx_hash = result;
-             swal("Model :"+web3.toAscii(model)+"\nStatus :"+web3.toAscii(status)+"\nData Manufactured :"+web3.toAscii(date_manufactured)+"\nCheck MetaMask for transaction success.",{icon:"success",});
-           }}
+             contract.getModel(function(err,res){
+               if(err){
+                 swal(err);
+               }
+               else{
+                 _model = web3.toAscii(res);
+                 contract.getStatus(function(err,res1){
+                   if(err){
+                     swal(err);
+                     }
+                     else{
+                       _status = web3.toAscii(res1);
+                       contract.getDateManufactured(function(err,res2){
+                         if(err){
+                           swal(err);
+                         }
+                         else{
+                           _date_manufactured = web3.toAscii(res2);
+                           swal("Information added","Transaction hash:"+tx_hash+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
+                         }
+                       });
+                     }
+                 });
+               }
+
+             });
+           }
+         }
+
 );
+
+
+
+// contract.getModel(function(err,res){
+//   if(err){
+//     swal(err);
+//   }
+//   else{
+//     _model = web3.toAscii(res);
+//     contract.getStatus(function(err,res1){
+//       if(err){
+//         swal(err);
+//         }
+//         else{
+//           _status = web3.toAscii(res1);
+//           contract.getDateManufactured(function(err,res2){
+//             if(err){
+//               swal(err);
+//             }
+//             else{
+//               _date_manufactured = web3.toAscii(res2);
+//               swal("Information added","Transaction hash:"+tx_hash+"\nModel :"+_model+"\nStatus :"+_status+"\nData Manufactured :"+_date_manufactured,"success");
+//             }
+//           });
+//         }
+//     });
+//   }
+//
+// });
+  //Read the previously written information from the smart contract
+  // var _model = web3.toAscii(contract.getModel());
+  // var _status = web3.toAscii(contract.getStatus());
+  // var _date_manufactured = web3.toAscii(contract.getDateManufactured());
+
 
 }//end addInfoContract
 
 //Transfer ownership of smart contract(Certificate of Authtenticity)
 function transferOwnership(){
 var transfer_address = document.getElementById("ethereum_trans_address").value;
+
+
+
 
 swal({
     title: "You are transfering certifaction ownership",
@@ -113,21 +178,17 @@ swal({
   .then((willTransfer) => {
 
     if(willTransfer){
-      contract.transferOwnership.sendTransaction(transfer_address,{
+      var tx_hash = contract.transferOwnership.sendTransaction(transfer_address,{
           from:web3.eth.accounts[0],
           gas:4000000
-      },function(err,res){
-        if(err){
-          swal(err);
-        }else{
-          swal("Your ownership has been transfered to " +transfer_address,{
-            icon:"success",
-          });
-        }
       });
-      //var _current_owner = contract.getCurrentOwner();
-    }
-    else{
+
+      var _current_owner = contract.getCurrentOwner();
+
+      swal("Your ownership has been transfered to " +_current_owner,{
+        icon:"success",
+      });
+    }else{
       swal("Ownership retained");
     }
   });
@@ -219,11 +280,15 @@ swal({
   <div class="form-group">
   <h4>Transfer Ownership :</h4>
       <select id="ethereum_trans_address">
-        <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">Seller: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
-        <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">DHL: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
-        <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">UPD 3: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
-        <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">FeDex 4: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
-        <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">Buyer 5: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+        <option value = "0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5">User 1: 0x9b7b42cc9d26eec8fa25dfee2f30d74c5428d0c5</option>
+        <option value = "0x4a924aed785c1e83a48939fcc8ddda6b326a5f08">User 2: 0x4a924aed785c1e83a48939fcc8ddda6b326a5f08</option>
+        <option value = "0x1ad5662a8b3c5883a097e52ccc3876ce889e063d">User 3: 0x1ad5662a8b3c5883a097e52ccc3876ce889e063d</option>
+        <option value = "0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6">User 4: 0x1fabfce5bde932f1ee61e7e15fa6df59bd8d11f6</option>
+        <option value = "0xcf4399e78d577d00f1454b5198172eb3295977d2">User 5: 0xcf4399e78d577d00f1454b5198172eb3295977d2</option>
+        <option value = "0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed">User 6: 0x40b9c880b6bfe91302c1015ae5eea8de01bbf9ed</option>
+        <option value = "0x11af1cf9324e22e0028aa559e70c23e077e924ce">User 7: 0x11af1cf9324e22e0028aa559e70c23e077e924ce</option>
+        <option value = "0x43b464d9450a5cef57e63765197dc83691d92eec">User 8: 0x43b464d9450a5cef57e63765197dc83691d92eec</option>
+        <option value = "0x7a20e20fd8b785209fef40e0d7d4580b40183878">User 9: 0x7a20e20fd8b785209fef40e0d7d4580b40183878</option>
       </select>
   </div>
 
