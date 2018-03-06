@@ -4,10 +4,11 @@ const bodyParser = require('body-parser');
 const Store = require("jfs");
 const db = new Store("data");
 const app = express();
+const fetch = require("node-fetch");
+const eth_price = "https://api.coinmarketcap.com/v1/ticker/ethereum/?convert=USD";
+
 
 app.use(bodyParser.urlencoded({extended: true}));
-
-//TODO: Create an index page to navigate the 3 relevant pages
 
 app.get('/manufacturer',function(req,res){
   var fileName = 'manufacturer.html';
@@ -25,9 +26,26 @@ app.get('/consumer',function(req,res){
 
 app.get('/buyer',function(req,res){
   var fileName = 'buyer.html';
+  var objPrice;
   app.use("/stylesheets",express.static(__dirname + '/stylesheets'));
   app.use("/javascripts",express.static(__dirname + '/javascripts'));
-  res.sendfile(fileName);
+
+  fetch(eth_price)
+    .then(response => {
+      response.json().then(json => {
+      objPrice = json[0];
+        // console.log(
+        //   `Symbol: ${objPrice.symbol} -`,
+        //   `Price in USD: ${objPrice.price_usd} -`,
+        //   `Price in BTC: ${objPrice.price_btc}`
+        // )
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+
+  res.send(fileName,JSON.stringify(objPrice));
 });
 
 app.get('/add_contract',function(req,res){

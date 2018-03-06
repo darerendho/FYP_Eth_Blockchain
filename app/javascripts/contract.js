@@ -1,27 +1,5 @@
 var contractABI=[
 	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_model",
-				"type": "bytes32"
-			},
-			{
-				"name": "_status",
-				"type": "bytes32"
-			},
-			{
-				"name": "_date_manufactured",
-				"type": "bytes32"
-			}
-		],
-		"name": "addNewGoods",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"constant": true,
 		"inputs": [],
 		"name": "getManufacturer",
@@ -89,20 +67,6 @@ var contractABI=[
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "log_count",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -211,20 +175,6 @@ var contractABI=[
 		"constant": false,
 		"inputs": [
 			{
-				"name": "_log",
-				"type": "bytes32"
-			}
-		],
-		"name": "addRepairInfo",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
 				"name": "_accept",
 				"type": "bool"
 			}
@@ -252,6 +202,28 @@ var contractABI=[
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_model",
+				"type": "bytes32"
+			},
+			{
+				"name": "_status",
+				"type": "bytes32"
+			},
+			{
+				"name": "_date_manufactured",
+				"type": "bytes32"
+			}
+		],
+		"name": "editContractInformation",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -379,25 +351,6 @@ var contractABI=[
 			{
 				"name": "",
 				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "repairs",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bytes32"
 			}
 		],
 		"payable": false,

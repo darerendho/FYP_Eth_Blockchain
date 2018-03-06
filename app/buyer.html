@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
   <title>Luxcure - Buyer</title>
   <script src="./javascripts/jquery-3.2.1.js"></script>
@@ -8,356 +9,346 @@
   <script src="./javascripts/bootstrap.min.js"></script>
   <script src="./javascripts/web3.js"></script>
   <script src="./javascripts/contract.js"></script>
+  <!--<script src="./javascripts/buyer.js"></script>-->
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <link rel="stylesheet"  type="text/css" href="./stylesheets/bootstrap.min.css"/>
-  <link rel="stylesheet"  type="text/css" href="./stylesheets/app.css"/>
+  <link rel="stylesheet" type="text/css" href="./stylesheets/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="./stylesheets/app.css" />
 
   <script>
-  if (typeof web3 !== 'undefined') {
-web3 = new Web3(web3.currentProvider);
-} else {
-// set the provider you want from Web3.providers
-web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-}
-//Add text field to change account buyer for web3 eth address
-
-web3.eth.defaultAccount = web3.eth.accounts[0];
-var ethereum_address = web3.eth.accounts[0] ;
-var contract;
-var contract_abi =web3.eth.contract(contractABI);
-
-
-//Change the contract address
-async function changeContract(){
-
-  var manufacturer,latest_owner,model,status,date_manufactured,numberOfOwners,list="",owners,purchased,contract_o;
-  contract_address = document.getElementById("smart_contract").value;
-  contract  = contract_abi.at(contract_address);
-
-  manufacturer = await contract.getManufacturer(function(err,manu){
-  if(err){
-    swal(err);
-  }else{
-    manufacturer = manu;
-    if("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer){
-      document.getElementById("verified").value = "Manufacturer Verified";
+    if (typeof web3 !== 'undefined') {
+      web3 = new Web3(web3.currentProvider);
+    } else {
+      // set the provider you want from Web3.providers
+      web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
     }
-    else{
-      document.getElementById("verified").value =  "Not original manufacturer";
-    }
-    swal("Working on contract address ",contract_address);
-  }
-  });
-
-   latest_owner = await contract.getCurrentOwner(function(err,cO){
-    if(err){
-      swal(err);
-    }
-    else{
-      document.getElementById("latest_owner").value =  cO;
-      contract_o =cO;
-    }
+    //Add text field to change account buyer for web3 eth address
+    const eth_price = "https://api.coinmarketcap.com/v1/ticker/ethereum/?convert=USD";
+    $.getJSON(eth_price,function(res){
+      $("#ethprice").html("Current Price of Eth :" +res[0].price_usd)
     });
 
-    model = await contract.getModel(function(err,mod){
-     if(err){
-       swal(err);
-     }
-     else{
-       document.getElementById("model").value =  web3.toAscii(mod);
-     }
-     });
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+    var ethereum_address = web3.eth.accounts[0];
+    var contract;
+    var contract_abi = web3.eth.contract(contractABI);
 
-     status = await contract.getStatus(function(err,stats){
-      if(err){
-        swal(err);
-      }
-      else{
-        document.getElementById("status").value =  web3.toAscii(stats);
-      }
+    async function changeContract() {
+
+      var manufacturer, latest_owner, model, status, date_manufactured, numberOfOwners, list = "",
+      owners, purchased, contract_o;
+      contract_address = document.getElementById("smart_contract").value;
+      contract = contract_abi.at(contract_address);
+
+      manufacturer = await contract.getManufacturer(function(err, manu) {
+        if (err) {
+          swal(err);
+        } else {
+          manufacturer = manu;
+          if ("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer) {
+            document.getElementById("verified").value = "Manufacturer Verified";
+          } else {
+            document.getElementById("verified").value = "Not original manufacturer";
+          }
+          swal("Working on contract address ", contract_address);
+        }
       });
 
-      date_manufactured = await contract.getDateManufactured(function(err,dM){
-       if(err){
-         swal(err);
-       }
-       else{
-         document.getElementById("date_manufactured").value =  web3.toAscii(dM);
-       }
-       });
-
-       numberOfOwners = await contract.getNumberOfOwners(function(err,nO){
-        if(err){
+      latest_owner = await contract.getCurrentOwner(function(err, cO) {
+        if (err) {
           swal(err);
+        } else {
+          document.getElementById("latest_owner").value = cO;
+          contract_o = cO;
         }
-        else{
+      });
+
+      model = await contract.getModel(function(err, mod) {
+        if (err) {
+          swal(err);
+        } else {
+          document.getElementById("model").value = web3.toAscii(mod);
+        }
+      });
+
+      status = await contract.getStatus(function(err, stats) {
+        if (err) {
+          swal(err);
+        } else {
+          document.getElementById("status").value = web3.toAscii(stats);
+        }
+      });
+
+      date_manufactured = await contract.getDateManufactured(function(err, dM) {
+        if (err) {
+          swal(err);
+        } else {
+          document.getElementById("date_manufactured").value = web3.toAscii(dM);
+        }
+      });
+
+      numberOfOwners = await contract.getNumberOfOwners(function(err, nO) {
+        if (err) {
+          swal(err);
+        } else {
           numberOfOwners = nO;
 
-          document.getElementById("no_owners").value =  numberOfOwners;
+          document.getElementById("no_owners").value = numberOfOwners;
         }
-        });
+      });
 
-        owners = await contract.getOwners(function(err,owner){
-         if(err){
-           swal(err);
-         }
-         else{
-           for(var i =0;i<owner.length;i++)
-           {
-             list += (i+1)+")"+owner[i] +"\n";
-           }
-           document.getElementById("list_owners").value =  list;
-         }
-         });
-
-
-purchased = await contract.getPurchased(function(err,purchase){
-  if(err){
-    swal(err);
-  }
-  else{
-    if(purchase){// if the good is purchased
-      document.getElementById("btn_acceptdelivery").disabled=false; //Allow buyer to accept good if he has purchased
-    }
-    else if(contract_o == web3.eth.accounts[0]){
-      document.getElementById("btn_get_ownership").disabled =true; //If Owner is buyer
-    }
-    else{
-      document.getElementById("btn_get_ownership").disabled=false; //Disable to prevent user from purchasing again
-
-    }
-  }
-});
-
-
-}//end changeContract
-
-//Transfer ether to the contract to receive ownership
-async function sendEthertoContract(){
-  var stolen = "Stolen";
-  var owned  = "Owned";
-  var current_stat,current_owner,cost_price;
-
-  var cost = await contract.getCost(function(err,cost){
-    if(err){
-      console.log(err);
-      }
-      else{
-        cost_price = cost;
-        get_status =  contract.getStatus(function(err,stats){
-          if(err){
-            swal(err);
+      owners = await contract.getOwners(function(err, owner) {
+        if (err) {
+          swal(err);
+        } else {
+          for (var i = 0; i < owner.length; i++) {
+            list += (i + 1) + ")" + owner[i] + "\n";
           }
-          else{
-            current_stat = web3.toAscii(stats);
-            var owner =  contract.getCurrentOwner(function(err,c_owner){
-              if(err){
-                swal(err);
-              }
-              else{
-                if(web3.eth.accounts[0] != c_owner && stolen.localeCompare(current_stat) != 0 && owned.localeCompare(current_stat) != 0){
-                  swal({
-                    title:"You are about the send ether to obtain a good/smart contract you wish purchase",
-                    text: "The cost of the good is "+cost_price+" Ether and delivery cost of 0.05 ether.",
-                    icon:"info",
-                    buttons:true,
-                    dangermode:true,
-                  }).then((willSendEther)=> {
-                    if(willSendEther){
-                      var payment_tx = contract.sendEther.sendTransaction(web3.eth.accounts[0],{from:web3.eth.accounts[0],
-                           value:web3.toWei(cost_price, "ether")},function(err,tx){if(err){swal(err);}else{
-
-                             contract.deliveryChargeBuyer.sendTransaction({from:web3.eth.accounts[0],
-                             value:web3.toWei(0.05,"ether")},function(err,tx){
-                               if(err){
-                                 swal(err);
-                               }
-                               else{
-                                 document.getElementById("btn_get_ownership").disabled = true;
-                                 document.getElementById("btn_acceptdelivery").disabled = false;
-
-                                 swal("Transfer has been made to seller!","Upon delivery of good, acknowledge that you have received the good else ownership will be kept by the seller.");
-                               }
-                             });
+          document.getElementById("list_owners").value = list;
+        }
+      });
 
 
+      purchased = await contract.getPurchased(function(err, purchase) {
+        if (err) {
+          swal(err);
+        } else {
+          if (purchase) { // if the good is purchased
+            document.getElementById("btn_acceptdelivery").disabled = false; //Allow buyer to accept good if he has purchased
+          } else if (contract_o == web3.eth.accounts[0]) {
+            document.getElementById("btn_get_ownership").disabled = true; //If Owner is buyer
+          } else {
+            document.getElementById("btn_get_ownership").disabled = false; //Disable to prevent user from purchasing again
 
-                          }}
-                         );
+          }
+        }
+      });
 
+
+    } //end changeContract
+
+    //Transfer ether to the contract to receive ownership
+    async function sendEthertoContract() {
+      var stolen = "Stolen";
+      var owned = "Owned";
+      var current_stat, current_owner, cost_price;
+
+      var cost = await contract.getCost(function(err, cost) {
+        if (err) {
+          console.log(err);
+        } else {
+          cost_price = cost;
+          get_status = contract.getStatus(function(err, stats) {
+            if (err) {
+              swal(err);
+            } else {
+              current_stat = web3.toAscii(stats);
+              var owner = contract.getCurrentOwner(function(err, c_owner) {
+                if (err) {
+                  swal(err);
+                } else {
+                  if (web3.eth.accounts[0] != c_owner && stolen.localeCompare(current_stat) != 0 && owned.localeCompare(current_stat) != 0) {
+                    swal({
+                      title: "You are about the send ether to obtain a good/smart contract you wish purchase",
+                      text: "The cost of the good is " + cost_price + " Ether and delivery cost of 0.05 ether.",
+                      icon: "info",
+                      buttons: true,
+                      dangermode: true,
+                    }).then((willSendEther) => {
+                      if (willSendEther) {
+                        var payment_tx = contract.sendEther.sendTransaction(web3.eth.accounts[0], {
+                          from: web3.eth.accounts[0],
+                          value: web3.toWei(cost_price, "ether")
+                        }, function(err, tx) {
+                          if (err) {
+                            swal(err);
+                          } else {
+
+                            contract.deliveryChargeBuyer.sendTransaction({
+                              from: web3.eth.accounts[0],
+                              value: web3.toWei(0.05, "ether")
+                            }, function(err, tx) {
+                              if (err) {
+                                swal(err);
+                              } else {
+                                document.getElementById("btn_get_ownership").disabled = true;
+                                document.getElementById("btn_acceptdelivery").disabled = false;
+
+                                swal("Transfer has been made to seller!", "Upon delivery of good, acknowledge that you have received the good else ownership will be kept by the seller.");
+                              }
+                            });
+
+
+
+                          }
+                        });
+
+                      } else {
+                        swal("Ether not sent");
+                      }
+                    }); //end then clause
+                  } //end if not owned, not stolen and not ownerd
+                  else {
+                    if (stolen.localeCompare(current_stat) == 0) {
+                      swal("This good is stolen from the orginal owner.\n DO NOT PURCHASE AND REPORT TO AUTHORITIES");
+                    } else if (owned.localeCompare(current_stat) == 0) {
+                      swal("The good is currently owned and not available for purchase");
+                    } else {
+                      swal("You already own this smart contract.");
                     }
-                    else{
-                      swal("Ether not sent");
-                    }
-                  });//end then clause
-              }//end if not owned, not stolen and not ownerd
-
-              else{
-                if(stolen.localeCompare(current_stat) == 0){
-                  swal("This good is stolen from the orginal owner.\n DO NOT PURCHASE AND REPORT TO AUTHORITIES");
+                  } //end else if stolen/owned
                 }
-                else if(owned.localeCompare(current_stat) == 0){
-                  swal("The good is currently owned and not available for purchase");
-                }
-                else{
-                    swal("You already own this smart contract.");
-                }
-              }//end else if stolen/owned
+              }); //end await contract getOwner
             }
-          });//end await contract getOwner
+          }); //end await getStatus
         }
-        });//end await getStatus
-      }
-  });
+      });
 
-}//end sendEtherForContract
+    } //end sendEtherForContract
 
-//Upon delivered to user accept good, verify and accept good
-function acceptDelivery(){
-  swal({
-      title: "You are accepting the delivery of good and verified the authenticity",
-      text: "Once complete, funds will be transferred to seller and ownership will be gained.",
-      icon: "warning",
-      buttons:true,
-      dangermode: true,
-    })
-    .then((willAccept) => {
+    //Upon delivered to user accept good, verify and accept good
+    function acceptDelivery() {
+      swal({
+          title: "You are accepting the delivery of good and verified the authenticity",
+          text: "Once complete, funds will be transferred to seller and ownership will be gained.",
+          icon: "warning",
+          buttons: true,
+          dangermode: true,
+        })
+        .then((willAccept) => {
 
-      if(willAccept){
-        var tx_hash = contract.acceptDelivery.sendTransaction(true,{
-            from:ethereum_address,
-            gas:4000000
-        },function(err,res){
-          if(err){
-            swal(err);
-          }
-          else{
-            contract.getCurrentOwner(function(err,cO){
-              if(err){
+          if (willAccept) {
+            var tx_hash = contract.acceptDelivery.sendTransaction(true, {
+              from: ethereum_address,
+              gas: 4000000
+            }, function(err, res) {
+              if (err) {
                 swal(err);
-              }
-              else{
-                swal("Your will has been ownership from " +cO+" and funds transferred to seller ",{
-                  icon:"success",
+              } else {
+                contract.getCurrentOwner(function(err, cO) {
+                  if (err) {
+                    swal(err);
+                  } else {
+                    swal("Your will has been ownership from " + cO + " and funds transferred to seller ", {
+                      icon: "success",
+                    });
+                  }
                 });
               }
             });
-          }
-        });
 
-      }
-      else{
-         contract.acceptDelivery.sendTransaction(false,{
-            from:ethereum_address,
-            gas:4000000
-        },function(err,refunded){
-          if(err){
-            swal(err);
-          }
-          else{
-            swal({
-              title:"Funds have been refunded back to you",
-              text: "Check your accoutn again"
+          } else {
+            contract.acceptDelivery.sendTransaction(false, {
+              from: ethereum_address,
+              gas: 4000000
+            }, function(err, refunded) {
+              if (err) {
+                swal(err);
+              } else {
+                swal({
+                  title: "Funds have been refunded back to you",
+                  text: "Check your accoutn again"
+                });
+              }
             });
+
           }
         });
-
-      }
-    });
-}//end acceptDelivery
+    } //end acceptDelivery
   </script>
 </head>
 <header>
   <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
-  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand" href="#">Luxcure</a>
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item ">
-        <a class="nav-link" href="./">Manufacturer</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="./consumer">Consumer/Seller</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link " href="./buyer">Buyer</a>
-      </li>
-    </ul>
+    <a class="navbar-brand" href="#">Luxcure</a>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item ">
+          <a class="nav-link" href="./">Manufacturer</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="./consumer">Consumer/Seller</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="./buyer">Buyer</a>
+        </li>
+      </ul>
 
-  </div>
-</nav>
+    </div>
+  </nav>
 </header>
+
 <body>
   <h1>Proof-of-Existence goods authentication</h1>
-  <h1>Verify manufacturer/owner and purchase good</h1>
-
+    <h1>Verify manufacturer/owner and purchase good</h1>
+      <h1 id="ethprice"></h1>
   <div class="contentform">
     <div class="leftcontact">
 
       <div class="form-group">
         <h4>Current Smart Contract: </h4>
-            <input type="text" name="smart_contract" id="smart_contract" placeholder="Enter smart contract address..."/>
-            <button type="submit" onclick="changeContract();" class="bouton-contact">Change contract</button>
+        <input type="text" name="smart_contract" id="smart_contract" placeholder="Enter smart contract address..." />
+        <button type="submit" onclick="changeContract();" class="bouton-contact">Change contract</button>
       </div>
 
       <div class="form-group">
-      <h4>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</h4>
+        <h4>Send ether to smart contract to gain ownership of Certificate of Authentication (Smart Contract):</h4>
         <input type="text" name="ethereum_contract_address" id="ethereum_contract_address" placeholder="Smart Contract Address ..." />
         <!--<input type="text" name="ethereum_ether_amount" id="ethereum_ether_amount" placeholder="Enter amount to send ..." />-->
-        <input type="text" name="transaction_hash" id="transaction_hash" placeholder="Transaction Hash"/>
+        <input type="text" name="transaction_hash" id="transaction_hash" placeholder="Transaction Hash" />
         <button type="submit" id="btn_get_ownership" onclick="sendEthertoContract();" class="bouton-contact">Transfer funds</button>
         <button type="submit" id="btn_acceptdelivery" onclick="acceptDelivery();" class="bouton-contact">Accept good</button>
       </div>
-  </div>
-
-  <div class="rightcontact">
-    <div class="form-group">
-      <h4>Certificate information: </h4>
-        <p>Manufacturer verification</p>
-        <input type="text" id="verified" disabled="true"/>
-      </br>
-      </br>
-      </br>
-        <p>Latest Owner</p>
-        <input type="text" id="latest_owner" disabled="true"/>
-      </br>
-      </br>
-      </br>
-        <p>Model</p>
-        <input type="text" id="model" disabled="true"/>
-      </br>
-      </br>
-      </br>
-        <p>Status</p>
-        <input type="text" id="status" disabled="true"/>
-      </br>
-      </br>
-      </br>
-        <p>Date Manufactured</p>
-        <input type="text" id="date_manufactured" disabled="true"/>
-      </br>
-      </br>
-      </br>
-      <p>Number of owners</p>
-      <input type="text" id="no_owners" disabled="true"/>
-      </br>
-      </br>
-      </br>
-      <p>List of owners</p>
-      <textarea row="4" col="10" id="list_owners" name="contract_information"></textarea>
     </div>
 
+    <div class="rightcontact">
+      <div class="form-group">
+        <h4>Certificate information: </h4>
+        <p>Manufacturer verification</p>
+        <input type="text" id="verified" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>Latest Owner</p>
+        <input type="text" id="latest_owner" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>Model</p>
+        <input type="text" id="model" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>Status</p>
+        <input type="text" id="status" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>Date Manufactured</p>
+        <input type="text" id="date_manufactured" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>Number of owners</p>
+        <input type="text" id="no_owners" disabled="true" />
+        </br>
+        </br>
+        </br>
+        <p>List of owners</p>
+        <textarea row="4" col="10" id="list_owners" name="contract_information"></textarea>
+      </div>
+
+
+    </div>
 
   </div>
 
-</div>
-
-<script>
-document.getElementById("ethereum_contract_address").disabled=true;
-document.getElementById("btn_get_ownership").disabled=true;
-document.getElementById("btn_acceptdelivery").disabled=true;
-</script>
+  <script>
+    document.getElementById("ethereum_contract_address").disabled = true;
+    document.getElementById("btn_get_ownership").disabled = true;
+    document.getElementById("btn_acceptdelivery").disabled = true;
+  </script>
 </body>
+
 </html>
