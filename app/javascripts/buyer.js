@@ -1,94 +1,98 @@
 //Change the contract address
 async function changeContract() {
+  if(document.getElementById("smart_contract").value == ""){
+    swal("Error","Please enter a valid smart contract address. Prefeably scan a QR code","warning");
+  }else{
+    var manufacturer, latest_owner, model, status, date_manufactured, numberOfOwners, list = "",
+    owners, purchased, contract_o;
+    contract_address = document.getElementById("smart_contract").value;
+    contract = contract_abi.at(contract_address);
 
-  var manufacturer, latest_owner, model, status, date_manufactured, numberOfOwners, list = "",
-  owners, purchased, contract_o;
-  contract_address = document.getElementById("smart_contract").value;
-  contract = contract_abi.at(contract_address);
-
-  manufacturer = await contract.getManufacturer(function(err, manu) {
-    if (err) {
-      swal(err);
-    } else {
-      manufacturer = manu;
-      if ("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer) {
-        document.getElementById("verified").value = "Manufacturer Verified";
+    manufacturer = await contract.getManufacturer(function(err, manu) {
+      if (err) {
+        swal(err);
       } else {
-        document.getElementById("verified").value = "Not original manufacturer";
+        manufacturer = manu;
+        if ("0x2fb350c462e3d20bd4637d0e1d60079c4ae3229a" == manufacturer) {
+          document.getElementById("verified").value = "Manufacturer Verified";
+        } else {
+          document.getElementById("verified").value = "Not original manufacturer";
+        }
+        swal("Working on contract address ", contract_address);
       }
-      swal("Working on contract address ", contract_address);
-    }
-  });
+    });
 
-  latest_owner = await contract.getCurrentOwner(function(err, cO) {
-    if (err) {
-      swal(err);
-    } else {
-      document.getElementById("latest_owner").value = cO;
-      contract_o = cO;
-    }
-  });
-
-  model = await contract.getModel(function(err, mod) {
-    if (err) {
-      swal(err);
-    } else {
-      document.getElementById("model").value = web3.toAscii(mod);
-    }
-  });
-
-  status = await contract.getStatus(function(err, stats) {
-    if (err) {
-      swal(err);
-    } else {
-      document.getElementById("status").value = web3.toAscii(stats);
-    }
-  });
-
-  date_manufactured = await contract.getDateManufactured(function(err, dM) {
-    if (err) {
-      swal(err);
-    } else {
-      document.getElementById("date_manufactured").value = web3.toAscii(dM);
-    }
-  });
-
-  numberOfOwners = await contract.getNumberOfOwners(function(err, nO) {
-    if (err) {
-      swal(err);
-    } else {
-      numberOfOwners = nO;
-
-      document.getElementById("no_owners").value = numberOfOwners;
-    }
-  });
-
-  owners = await contract.getOwners(function(err, owner) {
-    if (err) {
-      swal(err);
-    } else {
-      for (var i = 0; i < owner.length; i++) {
-        list += (i + 1) + ")" + owner[i] + "\n";
-      }
-      document.getElementById("list_owners").value = list;
-    }
-  });
-
-
-  purchased = await contract.getPurchased(function(err, purchase) {
-    if (err) {
-      swal(err);
-    } else {
-      if (purchase) { // if the good is purchased
-        document.getElementById("btn_acceptdelivery").disabled = false; //Allow buyer to accept good if he has purchased
-      } else if (contract_o == web3.eth.accounts[0]) {
-        document.getElementById("btn_get_ownership").disabled = true; //If Owner is buyer
+    latest_owner = await contract.getCurrentOwner(function(err, cO) {
+      if (err) {
+        swal(err);
       } else {
-        document.getElementById("btn_get_ownership").disabled = false; //Disable to prevent user from purchasing again
-
+        document.getElementById("latest_owner").value = cO;
+        contract_o = cO;
       }
-    }
-  });
+    });
+
+    model = await contract.getModel(function(err, mod) {
+      if (err) {
+        swal(err);
+      } else {
+        document.getElementById("model").value = web3.toAscii(mod);
+      }
+    });
+
+    status = await contract.getStatus(function(err, stats) {
+      if (err) {
+        swal(err);
+      } else {
+        document.getElementById("status").value = web3.toAscii(stats);
+      }
+    });
+
+    date_manufactured = await contract.getDateManufactured(function(err, dM) {
+      if (err) {
+        swal(err);
+      } else {
+        document.getElementById("date_manufactured").value = web3.toAscii(dM);
+      }
+    });
+
+    numberOfOwners = await contract.getNumberOfOwners(function(err, nO) {
+      if (err) {
+        swal(err);
+      } else {
+        numberOfOwners = nO;
+
+        document.getElementById("no_owners").value = numberOfOwners;
+      }
+    });
+
+    owners = await contract.getOwners(function(err, owner) {
+      if (err) {
+        swal(err);
+      } else {
+        for (var i = 0; i < owner.length; i++) {
+          list += (i + 1) + ")" + owner[i] + "\n";
+        }
+        document.getElementById("list_owners").value = list;
+      }
+    });
+
+
+    purchased = await contract.getPurchased(function(err, purchase) {
+      if (err) {
+        swal(err);
+      } else {
+        if (purchase) { // if the good is purchased
+          document.getElementById("btn_acceptdelivery").disabled = false; //Allow buyer to accept good if he has purchased
+        } else if (contract_o == web3.eth.accounts[0]) {
+          document.getElementById("btn_get_ownership").disabled = true; //If Owner is buyer
+        } else {
+          document.getElementById("btn_get_ownership").disabled = false; //Disable to prevent user from purchasing again
+
+        }
+      }
+    });
+  }
+
 
 
 } //end changeContract

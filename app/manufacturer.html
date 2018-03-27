@@ -6,7 +6,7 @@
   <script src="./javascripts/jquery-3.2.1.js"></script>
   <script src="./javascripts/moment.js"></script>
   <script src="./javascripts/utils.js"></script>
-  <script src="./javascripts/tether.js"></script>
+  <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
   <script src="./javascripts/bootstrap.js"></script>
   <script src="./javascripts/web3.js"></script>
   <script src="./javascripts/qrcode.js"></script>
@@ -25,6 +25,10 @@
       web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
     }
     web3.eth.defaultAccount = web3.eth.accounts[0]; //Account from default account (manfacturer)
+
+    $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
   </script>
 </head>
 <header>
@@ -32,11 +36,11 @@
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-    <a class="navbar-brand" href="#">Luxcure</a>
+    <a class="navbar-brand" href="./manufacturer">Luxcure</a>
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item ">
-          <a class="nav-link" href="./">Manufacturer</a>
+          <a class="nav-link" href="./Manufacturer">Manufacturer</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="./consumer">Consumer/Seller</a>
@@ -52,13 +56,16 @@
 
 <body>
   <h1>Proof-of-Existence goods authentication</h1>
-  <h1> Manufacturer</h1>
+  <h3> Manufacturer</h3>
+  <h5 >Deploy smart contract first!! <a text-align="center" href="https://remix.ethereum.org/" target="_blank">Here</a></h5>
+  <h5>1. Once the smart contract is deployed, wait for the contract  validation on the test network to retrieve the contract address.</h5>
+  <h5>2. Copy the smart contract address a paste to "Current smart contract" text box to work with address. This will also generate a QR code of the address</h5>
   <div class="contentform">
-    <div id="sendmessage"> Your message has been sent successfully. Thank you. </div>
 
     <div class="leftcontact">
       <div class="form-group">
-        <h4>Smart Contract : <span>*</span></h4>
+        <h4 data-toggle="tooltip">Current Smart Contract :</h4>
+
         <span class="icon-case"><i class="fa fa-map-marker"></i></span>
         <input type="text" id="contract_address" data-rule="required" data-msg="Enter an Ethereum address before beginning" />
         <div class="validation"></div>
@@ -119,7 +126,7 @@
       </div>
 
       <div class="form-group">
-        <button type="submit" id="transfer_ownership" onclick="transferOwnership();" class="bouton-contact">Transfer</button>
+        <button type="submit" id="transfer_ownership" onclick="transferOwnership();" class="bouton-contact" data-toogle="tooltip" data-placement="bottom" title="You must be manufacturer to access">Transfer</button>
       </div>
     </div>
   </div>

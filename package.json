@@ -37,6 +37,7 @@
   "dependencies": {
     "jfs": "^0.3.0",
     "mysql": "^2.15.0",
+    "node-fetch": "^2.1.1",
     "qrcode": "^1.2.0"
   }
 }
