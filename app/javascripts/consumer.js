@@ -27,7 +27,6 @@ async function workOnContract() {
         document.getElementById("btn_transfer").disabled = false;
         document.getElementById("status").disabled = false;
         document.getElementById("btn_status").disabled = false;
-        document.getElementById("text_qr_code").value = contract_address;
 
         swal("Working on contract address ", contract_address);
       } else {

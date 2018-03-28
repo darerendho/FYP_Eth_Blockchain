@@ -4,6 +4,8 @@ var contract_abi = web3.eth.contract(contractABI);
 //web3.eth.contract(contract_abi); // contract ABI
 
 //Change the contract being worked on
+
+
 function workOnContract() {
   if(document.getElementById("contract_address").value == ""){
 
@@ -18,15 +20,21 @@ function workOnContract() {
         swal("Error"," " + err,"warning");
       }
       else{
+
         if (web3.eth.defaultAccount == res) {
-          swal("Contract changed to ", "Address: " + contract_address);
-          document.getElementById("text_qr_code").value = contract_address
-          document.getElementById("transfer_ownership").disabled = false;
-          document.getElementById("model").disabled = false;
-          document.getElementById("status").disabled = false;
-          document.getElementById("ethereum_trans_address").disabled = false;
-          document.getElementById("date_manufactured").disabled = false;
-          document.getElementById("addinfobutton").disabled = false;
+          contract.getCurrentOwner(function(err,own){
+            swal("Contract changed to ", "Address: " + contract_address);
+            document.getElementById("text_qr_code").value = contract_address
+            document.getElementById("model").disabled = false;
+            document.getElementById("status").disabled = false;
+            document.getElementById("ethereum_trans_address").disabled = false;
+            document.getElementById("date_manufactured").disabled = false;
+            document.getElementById("addinfobutton").disabled = false;
+            if(web3.eth.defaultAccount==own){
+              document.getElementById("transfer_ownership").disabled = false;
+            }
+          });
+
         } else {
           document.getElementById("contract_address").value = "";
           swal("Error", "Address is either invalid smart contract address or you do not own the contract" + contract_address, "warning");

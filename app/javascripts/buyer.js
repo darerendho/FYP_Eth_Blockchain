@@ -143,16 +143,11 @@ async function sendEthertoContract() {
                           } else {
                             document.getElementById("btn_get_ownership").disabled = true;
                             document.getElementById("btn_acceptdelivery").disabled = false;
-
                             swal("Transfer has been made to seller!", "Upon delivery of good, acknowledge that you have received the good else ownership will be kept by the seller.");
                           }
                         });
-
-
-
                       }
                     });
-
                   } else {
                     swal("Ether not sent");
                   }
